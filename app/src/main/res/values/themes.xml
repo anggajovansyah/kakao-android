@@ -1,0 +1,12 @@
+<resources>
+    <style name="Theme.BerauCoalKakao" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Tema splash native (Android 12+ SplashScreen API): tampil sekilas
+         saat cold start SEBELUM Compose SplashScreen kita ambil alih.
+         Ikon di sini otomatis dibatasi ke lingkaran ~240dp oleh sistem. -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#2E5D34</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_leaf_single</item>
+        <item name="postSplashScreenTheme">@style/Theme.BerauCoalKakao</item>
+    </style>
+</resources>

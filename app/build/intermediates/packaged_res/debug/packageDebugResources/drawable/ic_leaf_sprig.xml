@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Batang -->
+    <path
+        android:strokeColor="#2E5D34"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M50,86 L50,22" />
+    <!-- Pasangan daun kiri-kanan, dari bawah ke atas -->
+    <path android:fillColor="#3E7C44" android:pathData="M50,72 C38,68 30,58 34,48 C44,50 52,60 50,72 Z" />
+    <path android:fillColor="#3E7C44" android:pathData="M50,72 C62,68 70,58 66,48 C56,50 48,60 50,72 Z" />
+    <path android:fillColor="#4A8F52" android:pathData="M50,50 C39,46 32,37 36,28 C46,30 53,39 50,50 Z" />
+    <path android:fillColor="#4A8F52" android:pathData="M50,50 C61,46 68,37 64,28 C54,30 47,39 50,50 Z" />
+    <!-- Daun pucuk -->
+    <path android:fillColor="#5AA562" android:pathData="M50,28 C45,20 46,12 50,8 C54,12 55,20 50,28 Z" />
+</vector>
