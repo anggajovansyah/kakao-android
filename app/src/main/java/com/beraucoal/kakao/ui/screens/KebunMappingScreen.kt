@@ -2,27 +2,28 @@ package com.beraucoal.kakao.ui.screens
 
 import android.Manifest
 import android.content.pm.PackageManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.beraucoal.kakao.RegistrationViewModel
 import com.beraucoal.kakao.UiState
+import com.beraucoal.kakao.ui.components.*
+import com.beraucoal.kakao.ui.theme.*
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
-/**
- * Tahap 4: Mapping kebun -- menghubungkan petani dengan lokasi kebunnya.
- * Petani tap titik di peta (jadi acuan pin lokasi) atau tombol "gunakan lokasi saya"
- * kalau sedang berdiri di kebun. Luas lahan diisi manual dulu (estimasi kasar);
- * kalau nanti perlu polygon batas kebun yang presisi, tambahkan drawing tool terpisah.
- */
 @Composable
 fun KebunMappingScreen(
     viewModel: RegistrationViewModel,
@@ -31,11 +32,9 @@ fun KebunMappingScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
 
-    // Default kamera: area operasi PT. Berau Coal, Kalimantan Timur -- sesuaikan kalau perlu
     val defaultLocation = LatLng(2.1500, 117.4667)
     var pinnedLocation by remember { mutableStateOf<LatLng?>(null) }
     var luasHektarText by remember { mutableStateOf("") }
-    var locationError by remember { mutableStateOf<String?>(null) }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(defaultLocation, 12f)
@@ -45,92 +44,130 @@ fun KebunMappingScreen(
         context, Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(
-            "Mapping kebun",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(24.dp, 24.dp, 24.dp, 8.dp)
-        )
-        Text(
-            "Ketuk peta di lokasi kebun, atau gunakan lokasi GPS kalau sedang di lapangan.",
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        Box(modifier = Modifier.weight(1f).padding(vertical = 12.dp)) {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
-                onMapClick = { latLng -> pinnedLocation = latLng }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(KakaoColors.Background)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // ── Title ──
+            Column(
+                modifier = Modifier.padding(
+                    horizontal = 24.dp,
+                    vertical = 20.dp
+                )
             ) {
-                pinnedLocation?.let { loc ->
-                    Marker(state = MarkerState(position = loc), title = "Lokasi kebun")
+                Text(
+                    text = "Mapping Kebun Kakao",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = KakaoColors.TextPrimary
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = "Ketuk area peta untuk menentukan titik koordinat kebun atau gunakan sensor GPS langsung di lapangan",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = KakaoColors.TextSecondary,
+                    lineHeight = 20.sp
+                )
+            }
+
+            // ── Map Container (Dengan Margin & Rounded Shape) ──
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                shadowElevation = KakaoElevation.Medium,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 20.dp, vertical = 6.dp)
+            ) {
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                    properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
+                    onMapClick = { latLng -> pinnedLocation = latLng }
+                ) {
+                    pinnedLocation?.let { loc ->
+                        Marker(
+                            state = MarkerState(position = loc),
+                            title = "Lokasi Kebun Kakao"
+                        )
+                    }
                 }
             }
-        }
 
-        Column(modifier = Modifier.padding(24.dp)) {
-            if (hasLocationPermission) {
-                OutlinedButton(
-                    onClick = {
-                        locationError = null
-                        try {
-                            val fusedClient = LocationServices.getFusedLocationProviderClient(context)
-                            fusedClient.lastLocation
-                                .addOnSuccessListener { loc ->
+            Spacer(Modifier.height(16.dp))
+
+            // ── Bottom Form Card (Whitespace Luas & Nyaman) ──
+            Card(
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                colors = CardDefaults.cardColors(containerColor = KakaoColors.Surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = KakaoElevation.High),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 28.dp, vertical = 28.dp)) {
+                    if (hasLocationPermission) {
+                        KakaoOutlinedButton(
+                            text = "Gunakan Lokasi GPS Saya Saat Ini",
+                            onClick = {
+                                val fusedClient = LocationServices.getFusedLocationProviderClient(context)
+                                fusedClient.lastLocation.addOnSuccessListener { loc ->
                                     if (loc != null) {
                                         val latLng = LatLng(loc.latitude, loc.longitude)
                                         pinnedLocation = latLng
                                         cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 16f)
-                                    } else {
-                                        locationError = "Lokasi belum tersedia -- coba lagi di area terbuka " +
-                                            "atau pastikan GPS aktif, lalu tap manual di peta kalau perlu."
                                     }
                                 }
-                                .addOnFailureListener { e ->
-                                    locationError = "Gagal ambil lokasi: ${e.message}"
-                                }
-                        } catch (e: SecurityException) {
-                            // Izin lokasi ternyata sudah dicabut sejak layar ini dibuka
-                            // (mis. lewat Settings sistem) -- jangan sampai app crash.
-                            locationError = "Izin lokasi tidak aktif. Aktifkan lewat pengaturan aplikasi, " +
-                                "atau tap manual di peta."
+                            },
+                            icon = {
+                                Icon(
+                                    Icons.Filled.LocationOn,
+                                    contentDescription = null,
+                                    tint = KakaoColors.Primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        )
+                        Spacer(Modifier.height(20.dp))
+                    }
+
+                    KakaoOutlinedTextField(
+                        value = luasHektarText,
+                        onValueChange = { luasHektarText = it },
+                        label = "Estimasi Luas Kebun (Hektar, Opsional)",
+                        leadingIcon = Icons.Filled.Place
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    KakaoPrimaryButton(
+                        text = if (pinnedLocation != null) "Simpan & Selesaikan Registrasi" else "Pilih Pin Lokasi di Peta",
+                        onClick = {
+                            val loc = pinnedLocation ?: return@KakaoPrimaryButton
+                            val luas = luasHektarText.toDoubleOrNull()
+                            viewModel.submitKebun(loc.latitude, loc.longitude, luas, onDone = onSubmitted)
+                        },
+                        enabled = pinnedLocation != null,
+                        isLoading = uiState is UiState.Loading,
+                        loadingText = "Menyimpan...",
+                        icon = {
+                            Icon(
+                                Icons.Filled.Place,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Gunakan lokasi saya saat ini")
-                }
-                locationError?.let {
+                    )
+
+                    if (uiState is UiState.Error) {
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            (uiState as UiState.Error).message,
+                            color = KakaoColors.Error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
                     Spacer(Modifier.height(8.dp))
-                    Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                 }
-                Spacer(Modifier.height(12.dp))
-            }
-
-            OutlinedTextField(
-                value = luasHektarText,
-                onValueChange = { luasHektarText = it },
-                label = { Text("Estimasi luas kebun (hektar, opsional)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    val loc = pinnedLocation ?: return@Button
-                    val luas = luasHektarText.toDoubleOrNull()
-                    viewModel.submitKebun(loc.latitude, loc.longitude, luas, onDone = onSubmitted)
-                },
-                enabled = pinnedLocation != null && uiState !is UiState.Loading,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(if (uiState is UiState.Loading) "Menyimpan..." else "Simpan lokasi kebun")
-            }
-
-            if (uiState is UiState.Error) {
-                Spacer(Modifier.height(12.dp))
-                Text((uiState as UiState.Error).message, color = MaterialTheme.colorScheme.error)
             }
         }
     }

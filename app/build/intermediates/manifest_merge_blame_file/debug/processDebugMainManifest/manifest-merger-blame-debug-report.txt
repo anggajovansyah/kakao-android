@@ -19,259 +19,276 @@
 13-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:6:22-76
 14
 15    <uses-feature
-15-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:7:5-84
+15-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:7:5-85
 16        android:name="android.hardware.camera"
 16-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:7:19-57
-17        android:required="true" />
-17-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:7:58-81
-18    <!-- Include required permissions for Google Maps API to run. -->
-19    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-19-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:23:5-79
-19-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:23:22-76
-20
-21    <uses-feature
-21-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:26:5-28:35
-22        android:glEsVersion="0x00020000"
-22-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:27:9-41
-23        android:required="true" />
-23-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:28:9-32
-24
-25    <queries>
-25-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:30:5-34:15
-26
-27        <!-- Needs to be explicitly declared on Android R+ -->
-28        <package android:name="com.google.android.apps.maps" />
-28-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:33:9-64
-28-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:33:18-61
-29    </queries>
-30
-31    <permission
-31-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:22:5-24:47
-32        android:name="com.beraucoal.kakao.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-32-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:23:9-81
-33        android:protectionLevel="signature" />
-33-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:24:9-44
-34
-35    <uses-permission android:name="com.beraucoal.kakao.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
-35-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:26:5-97
-35-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:26:22-94
-36
-37    <application
-37-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:9:5-30:19
-38        android:allowBackup="true"
-38-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:10:9-35
-39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-39-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:28:18-86
-40        android:debuggable="true"
-41        android:extractNativeLibs="false"
-42        android:icon="@mipmap/ic_launcher"
-42-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:11:9-43
-43        android:label="@string/app_name"
-43-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:12:9-41
-44        android:supportsRtl="true"
-44-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:14:9-35
-45        android:testOnly="true"
-46        android:theme="@style/Theme.BerauCoalKakao" >
-46-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:13:9-52
-47
-48        <!-- Replace with your own Google Maps API key before running -->
-49        <meta-data
-49-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:17:9-19:54
-50            android:name="com.google.android.geo.API_KEY"
-50-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:18:13-58
-51            android:value="YOUR_MAPS_API_KEY_HERE" />
-51-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:19:13-51
-52
-53        <activity
-53-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:21:9-29:20
-54            android:name="com.beraucoal.kakao.MainActivity"
-54-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:22:13-41
-55            android:exported="true"
-55-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:23:13-36
-56            android:theme="@style/Theme.App.Starting" >
-56-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:24:13-54
-57            <intent-filter>
-57-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:25:13-28:29
-58                <action android:name="android.intent.action.MAIN" />
-58-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:26:17-69
-58-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:26:25-66
-59
-60                <category android:name="android.intent.category.LAUNCHER" />
-60-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:27:17-77
-60-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:27:27-74
-61            </intent-filter>
-62        </activity>
-63
-64        <service
-64-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:24:9-33:19
-65            android:name="androidx.camera.core.impl.MetadataHolderService"
-65-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:25:13-75
-66            android:enabled="false"
-66-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:26:13-36
-67            android:exported="false" >
-67-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:27:13-37
-68            <meta-data
-68-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:30:13-32:89
-69                android:name="androidx.camera.core.impl.MetadataHolderService.DEFAULT_CONFIG_PROVIDER"
-69-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:31:17-103
-70                android:value="androidx.camera.camera2.Camera2Config$DefaultProvider" />
-70-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:32:17-86
-71        </service>
-72        <service
-72-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:9:9-15:19
-73            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
-73-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:10:13-91
-74            android:directBootAware="true"
-74-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:17:13-43
-75            android:exported="false" >
-75-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:11:13-37
-76            <meta-data
-76-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:12:13-14:85
-77                android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar"
-77-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:13:17-114
-78                android:value="com.google.firebase.components.ComponentRegistrar" />
-78-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:14:17-82
-79            <meta-data
-79-->[com.google.mlkit:vision-common:17.3.0] C:\Users\angga\.gradle\caches\transforms-4\f8d4b8485aaa5c7f55dd8b62e0d3d6f0\transformed\vision-common-17.3.0\AndroidManifest.xml:12:13-14:85
-80                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
-80-->[com.google.mlkit:vision-common:17.3.0] C:\Users\angga\.gradle\caches\transforms-4\f8d4b8485aaa5c7f55dd8b62e0d3d6f0\transformed\vision-common-17.3.0\AndroidManifest.xml:13:17-124
-81                android:value="com.google.firebase.components.ComponentRegistrar" />
-81-->[com.google.mlkit:vision-common:17.3.0] C:\Users\angga\.gradle\caches\transforms-4\f8d4b8485aaa5c7f55dd8b62e0d3d6f0\transformed\vision-common-17.3.0\AndroidManifest.xml:14:17-82
-82            <meta-data
-82-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:20:13-22:85
-83                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
-83-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:21:17-120
-84                android:value="com.google.firebase.components.ComponentRegistrar" />
-84-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:22:17-82
-85        </service>
-86
-87        <provider
-87-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:9:9-13:38
-88            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
-88-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:10:13-78
-89            android:authorities="com.beraucoal.kakao.mlkitinitprovider"
-89-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:11:13-69
-90            android:exported="false"
-90-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:12:13-37
-91            android:initOrder="99" /> <!-- Needs to be explicitly declared on P+ -->
-91-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:13:13-35
-92        <uses-library
-92-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:39:9-41:40
-93            android:name="org.apache.http.legacy"
-93-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:40:13-50
-94            android:required="false" />
-94-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:41:13-37
-95
-96        <activity
-96-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
-97            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-97-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+17        android:required="false" />
+17-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:7:58-82
+18    <uses-feature
+18-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:8:5-95
+19        android:name="android.hardware.camera.autofocus"
+19-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:8:19-67
+20        android:required="false" />
+20-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:8:68-92
+21    <!-- For remote config -->
+22    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+22-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:7:5-79
+22-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:7:22-76
+23
+24    <uses-feature
+24-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:26:5-28:35
+25        android:glEsVersion="0x00020000"
+25-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:27:9-41
+26        android:required="true" />
+26-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:28:9-32
+27
+28    <queries>
+28-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:30:5-34:15
+29
+30        <!-- Needs to be explicitly declared on Android R+ -->
+31        <package android:name="com.google.android.apps.maps" />
+31-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:33:9-64
+31-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:33:18-61
+32    </queries>
+33
+34    <permission
+34-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:22:5-24:47
+35        android:name="com.beraucoal.kakao.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+35-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:23:9-81
+36        android:protectionLevel="signature" />
+36-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:24:9-44
+37
+38    <uses-permission android:name="com.beraucoal.kakao.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+38-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:26:5-97
+38-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:26:22-94
+39
+40    <application
+40-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:10:5-31:19
+41        android:allowBackup="true"
+41-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:11:9-35
+42        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+42-->[androidx.core:core:1.13.0] C:\Users\angga\.gradle\caches\transforms-4\a3db133ffc67abbc916a23ae4b5fd453\transformed\core-1.13.0\AndroidManifest.xml:28:18-86
+43        android:debuggable="true"
+44        android:extractNativeLibs="false"
+45        android:icon="@mipmap/ic_launcher"
+45-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:12:9-43
+46        android:label="@string/app_name"
+46-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:13:9-41
+47        android:supportsRtl="true"
+47-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:15:9-35
+48        android:theme="@style/Theme.BerauCoalKakao" >
+48-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:14:9-52
+49
+50        <!-- Replace with your own Google Maps API key before running -->
+51        <meta-data
+51-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:18:9-20:54
+52            android:name="com.google.android.geo.API_KEY"
+52-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:19:13-58
+53            android:value="YOUR_MAPS_API_KEY_HERE" />
+53-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:20:13-51
+54
+55        <activity
+55-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:22:9-30:20
+56            android:name="com.beraucoal.kakao.MainActivity"
+56-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:23:13-41
+57            android:exported="true"
+57-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:24:13-36
+58            android:theme="@style/Theme.App.Starting" >
+58-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:25:13-54
+59            <intent-filter>
+59-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:26:13-29:29
+60                <action android:name="android.intent.action.MAIN" />
+60-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:27:17-69
+60-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:27:25-66
+61
+62                <category android:name="android.intent.category.LAUNCHER" />
+62-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:28:17-77
+62-->D:\Berau\kakao-android\app\src\main\AndroidManifest.xml:28:27-74
+63            </intent-filter>
+64        </activity>
+65
+66        <service
+66-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:24:9-33:19
+67            android:name="androidx.camera.core.impl.MetadataHolderService"
+67-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:25:13-75
+68            android:enabled="false"
+68-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:26:13-36
+69            android:exported="false" >
+69-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:27:13-37
+70            <meta-data
+70-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:30:13-32:89
+71                android:name="androidx.camera.core.impl.MetadataHolderService.DEFAULT_CONFIG_PROVIDER"
+71-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:31:17-103
+72                android:value="androidx.camera.camera2.Camera2Config$DefaultProvider" />
+72-->[androidx.camera:camera-camera2:1.3.4] C:\Users\angga\.gradle\caches\transforms-4\40d3e7b14b154e25a43080dab422f582\transformed\camera-camera2-1.3.4\AndroidManifest.xml:32:17-86
+73        </service>
+74        <service
+74-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:11:9-17:19
+75            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
+75-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:12:13-91
+76            android:directBootAware="true"
+76-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:17:13-43
+77            android:exported="false" >
+77-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:13:13-37
+78            <meta-data
+78-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:14:13-16:85
+79                android:name="com.google.firebase.components:com.google.mlkit.vision.objects.defaults.internal.DefaultObjectsRegistrar"
+79-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:15:17-136
+80                android:value="com.google.firebase.components.ComponentRegistrar" />
+80-->[com.google.mlkit:object-detection:17.0.2] C:\Users\angga\.gradle\caches\transforms-4\94834ae56a085299f57ceb16ce051cfe\transformed\object-detection-17.0.2\AndroidManifest.xml:16:17-82
+81            <meta-data
+81-->[com.google.mlkit:vision-internal-vkp:18.2.3] C:\Users\angga\.gradle\caches\transforms-4\baeddcbb2aa1f2c2a63c8ee58a70c1f7\transformed\vision-internal-vkp-18.2.3\AndroidManifest.xml:14:13-16:85
+82                android:name="com.google.firebase.components:com.google.mlkit.vision.vkp.VkpRegistrar"
+82-->[com.google.mlkit:vision-internal-vkp:18.2.3] C:\Users\angga\.gradle\caches\transforms-4\baeddcbb2aa1f2c2a63c8ee58a70c1f7\transformed\vision-internal-vkp-18.2.3\AndroidManifest.xml:15:17-103
+83                android:value="com.google.firebase.components.ComponentRegistrar" />
+83-->[com.google.mlkit:vision-internal-vkp:18.2.3] C:\Users\angga\.gradle\caches\transforms-4\baeddcbb2aa1f2c2a63c8ee58a70c1f7\transformed\vision-internal-vkp-18.2.3\AndroidManifest.xml:16:17-82
+84            <meta-data
+84-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:12:13-14:85
+85                android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar"
+85-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:13:17-114
+86                android:value="com.google.firebase.components.ComponentRegistrar" />
+86-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\angga\.gradle\caches\transforms-4\ba5cc92835e34edd877e772e21719916\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:14:17-82
+87            <meta-data
+87-->[com.google.mlkit:vision-common:17.3.0] C:\Users\angga\.gradle\caches\transforms-4\f8d4b8485aaa5c7f55dd8b62e0d3d6f0\transformed\vision-common-17.3.0\AndroidManifest.xml:12:13-14:85
+88                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
+88-->[com.google.mlkit:vision-common:17.3.0] C:\Users\angga\.gradle\caches\transforms-4\f8d4b8485aaa5c7f55dd8b62e0d3d6f0\transformed\vision-common-17.3.0\AndroidManifest.xml:13:17-124
+89                android:value="com.google.firebase.components.ComponentRegistrar" />
+89-->[com.google.mlkit:vision-common:17.3.0] C:\Users\angga\.gradle\caches\transforms-4\f8d4b8485aaa5c7f55dd8b62e0d3d6f0\transformed\vision-common-17.3.0\AndroidManifest.xml:14:17-82
+90            <meta-data
+90-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:20:13-22:85
+91                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
+91-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:21:17-120
+92                android:value="com.google.firebase.components.ComponentRegistrar" />
+92-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:22:17-82
+93        </service>
+94
+95        <provider
+95-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:9:9-13:38
+96            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+96-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:10:13-78
+97            android:authorities="com.beraucoal.kakao.mlkitinitprovider"
+97-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:11:13-69
 98            android:exported="false"
-98-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
-99            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-99-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
-100
-101        <meta-data
-101-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\angga\.gradle\caches\transforms-4\03233ce612030785a644ea85f8aa2e65\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
-102            android:name="com.google.android.gms.version"
-102-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\angga\.gradle\caches\transforms-4\03233ce612030785a644ea85f8aa2e65\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
-103            android:value="@integer/google_play_services_version" />
-103-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\angga\.gradle\caches\transforms-4\03233ce612030785a644ea85f8aa2e65\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
-104
-105        <provider
-105-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-106            android:name="androidx.startup.InitializationProvider"
-106-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
-107            android:authorities="com.beraucoal.kakao.androidx-startup"
-107-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
-108            android:exported="false" >
-108-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
-109            <meta-data
-109-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-110                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-110-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
-111                android:value="androidx.startup" />
-111-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
-112            <meta-data
-112-->[androidx.lifecycle:lifecycle-process:2.8.2] C:\Users\angga\.gradle\caches\transforms-4\beb62f81045527377a744f98caf4532e\transformed\lifecycle-process-2.8.2\AndroidManifest.xml:29:13-31:52
-113                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-113-->[androidx.lifecycle:lifecycle-process:2.8.2] C:\Users\angga\.gradle\caches\transforms-4\beb62f81045527377a744f98caf4532e\transformed\lifecycle-process-2.8.2\AndroidManifest.xml:30:17-78
-114                android:value="androidx.startup" />
-114-->[androidx.lifecycle:lifecycle-process:2.8.2] C:\Users\angga\.gradle\caches\transforms-4\beb62f81045527377a744f98caf4532e\transformed\lifecycle-process-2.8.2\AndroidManifest.xml:31:17-49
-115            <meta-data
-115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
-116                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-116-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
-117                android:value="androidx.startup" />
-117-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
-118        </provider>
-119
-120        <service
-120-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:29:9-35:19
-121            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
-121-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:30:13-103
-122            android:exported="false" >
-122-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:31:13-37
+98-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:12:13-37
+99            android:initOrder="99" /> <!-- Needs to be explicitly declared on P+ -->
+99-->[com.google.mlkit:common:18.11.0] C:\Users\angga\.gradle\caches\transforms-4\098d6991556d8ee249fb1c76c0e28b4c\transformed\common-18.11.0\AndroidManifest.xml:13:13-35
+100        <uses-library
+100-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:39:9-41:40
+101            android:name="org.apache.http.legacy"
+101-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:40:13-50
+102            android:required="false" />
+102-->[com.google.android.gms:play-services-maps:19.0.0] C:\Users\angga\.gradle\caches\transforms-4\4813d181c60a079324510104c550c4f4\transformed\play-services-maps-19.0.0\AndroidManifest.xml:41:13-37
+103
+104        <activity
+104-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+105            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+105-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+106            android:exported="false"
+106-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+107            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+107-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\angga\.gradle\caches\transforms-4\db3e207e8cdea149435fa399a0395321\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
+108
+109        <meta-data
+109-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\angga\.gradle\caches\transforms-4\03233ce612030785a644ea85f8aa2e65\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+110            android:name="com.google.android.gms.version"
+110-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\angga\.gradle\caches\transforms-4\03233ce612030785a644ea85f8aa2e65\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+111            android:value="@integer/google_play_services_version" />
+111-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\angga\.gradle\caches\transforms-4\03233ce612030785a644ea85f8aa2e65\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+112
+113        <provider
+113-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+114            android:name="androidx.startup.InitializationProvider"
+114-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+115            android:authorities="com.beraucoal.kakao.androidx-startup"
+115-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+116            android:exported="false" >
+116-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+117            <meta-data
+117-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+118                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+118-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+119                android:value="androidx.startup" />
+119-->[androidx.emoji2:emoji2:1.3.0] C:\Users\angga\.gradle\caches\transforms-4\192474c036ec43764acdf6f3e34ae042\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+120            <meta-data
+120-->[androidx.lifecycle:lifecycle-process:2.8.2] C:\Users\angga\.gradle\caches\transforms-4\beb62f81045527377a744f98caf4532e\transformed\lifecycle-process-2.8.2\AndroidManifest.xml:29:13-31:52
+121                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+121-->[androidx.lifecycle:lifecycle-process:2.8.2] C:\Users\angga\.gradle\caches\transforms-4\beb62f81045527377a744f98caf4532e\transformed\lifecycle-process-2.8.2\AndroidManifest.xml:30:17-78
+122                android:value="androidx.startup" />
+122-->[androidx.lifecycle:lifecycle-process:2.8.2] C:\Users\angga\.gradle\caches\transforms-4\beb62f81045527377a744f98caf4532e\transformed\lifecycle-process-2.8.2\AndroidManifest.xml:31:17-49
 123            <meta-data
-123-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:32:13-34:39
-124                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
-124-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:33:17-94
-125                android:value="cct" />
-125-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:34:17-36
-126        </service>
-127        <service
-127-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:26:9-30:19
-128            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
-128-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:27:13-117
-129            android:exported="false"
-129-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:28:13-37
-130            android:permission="android.permission.BIND_JOB_SERVICE" >
-130-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:29:13-69
-131        </service>
-132
-133        <receiver
-133-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:32:9-34:40
-134            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
-134-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:33:13-132
-135            android:exported="false" />
-135-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:34:13-37
-136        <receiver
-136-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
-137            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-137-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
-138            android:directBootAware="false"
-138-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
-139            android:enabled="true"
-139-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
-140            android:exported="true"
-140-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
-141            android:permission="android.permission.DUMP" >
-141-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
-142            <intent-filter>
-142-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
-143                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-143-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
-143-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
-144            </intent-filter>
-145            <intent-filter>
-145-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
-146                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-146-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
-146-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
-147            </intent-filter>
-148            <intent-filter>
-148-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
-149                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-149-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
-149-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
-150            </intent-filter>
-151            <intent-filter>
-151-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
-152                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-152-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
-152-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
-153            </intent-filter>
-154        </receiver>
-155    </application>
-156
-157</manifest>
+123-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+124                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+125                android:value="androidx.startup" />
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+126        </provider>
+127
+128        <service
+128-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:29:9-35:19
+129            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+129-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:30:13-103
+130            android:exported="false" >
+130-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:31:13-37
+131            <meta-data
+131-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:32:13-34:39
+132                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+132-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:33:17-94
+133                android:value="cct" />
+133-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\angga\.gradle\caches\transforms-4\97e132eedbbc24660e89a492168689f5\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:34:17-36
+134        </service>
+135        <service
+135-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:26:9-30:19
+136            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+136-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:27:13-117
+137            android:exported="false"
+137-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:28:13-37
+138            android:permission="android.permission.BIND_JOB_SERVICE" >
+138-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:29:13-69
+139        </service>
+140
+141        <receiver
+141-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:32:9-34:40
+142            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+142-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:33:13-132
+143            android:exported="false" />
+143-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\angga\.gradle\caches\transforms-4\cbdf2690b7bebf66276e3f22bd116a61\transformed\transport-runtime-2.2.6\AndroidManifest.xml:34:13-37
+144        <receiver
+144-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+145            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+145-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+146            android:directBootAware="false"
+146-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+147            android:enabled="true"
+147-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+148            android:exported="true"
+148-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+149            android:permission="android.permission.DUMP" >
+149-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+150            <intent-filter>
+150-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+151                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+151-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+151-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+152            </intent-filter>
+153            <intent-filter>
+153-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+154                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+154-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+154-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+155            </intent-filter>
+156            <intent-filter>
+156-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+157                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+157-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+157-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+158            </intent-filter>
+159            <intent-filter>
+159-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+160                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+160-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+160-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\angga\.gradle\caches\transforms-4\4e16cc280eaa0a1f5277c41379c36ea2\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+161            </intent-filter>
+162        </receiver>
+163    </application>
+164
+165</manifest>

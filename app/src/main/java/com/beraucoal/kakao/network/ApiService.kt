@@ -19,6 +19,7 @@ import retrofit2.http.Query
 // kalau instance NocoBase tim kamu ternyata beda format (versi/plugin custom bisa sedikit beda).
 
 data class NocoBaseSingleResponse<T>(val data: T)
+data class NocoBaseListResponse<T>(val data: List<T>)
 
 data class PetaniFields(
     val nik: String,
@@ -34,6 +35,12 @@ data class PetaniFields(
 
 data class PetaniRecord(
     val id: Long,
+    val nik: String? = null,
+    val nama: String? = null,
+    val alamat: String? = null,
+    val kelurahanDesa: String? = null,
+    val kecamatan: String? = null,
+    val nomorWhatsapp: String? = null,
     val status: String? // "pending" | "disetujui" | "ditolak" -- sesuaikan dengan nilai asli di NocoBase
 )
 
@@ -57,6 +64,12 @@ interface NocoBaseApi {
 
     @GET("api/petani:get")
     suspend fun getPetani(@Query("filterByTk") petaniId: Long): Response<NocoBaseSingleResponse<PetaniRecord>>
+
+    @GET("api/petani:list")
+    suspend fun findPetaniByWa(@Query("filter[nomorWhatsapp]") nomorWhatsapp: String): Response<NocoBaseListResponse<PetaniRecord>>
+
+    @GET("api/petani:list")
+    suspend fun findPetaniByNik(@Query("filter[nik]") nik: String): Response<NocoBaseListResponse<PetaniRecord>>
 
     @POST("api/kebun:create")
     suspend fun submitKebun(@Body body: KebunFields): Response<NocoBaseSingleResponse<Map<String, Any?>>>
