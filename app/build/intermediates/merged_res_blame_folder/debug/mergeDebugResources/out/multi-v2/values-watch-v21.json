@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.beraucoal.kakao.app-mergeDebugResources-59:/values-watch-v21/values-watch-v21.xml",
+            "outputFile": "com.beraucoal.kakao.app-mergeDebugResources-62:/values-watch-v21/values-watch-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\marwo\\.gradle\\caches\\transforms-4\\316503c5dcc4c8b61b00057b23c73fda\\transformed\\appcompat-1.6.1\\res\\values-watch-v21\\values-watch-v21.xml",
+                    "source": "C:\\Users\\angga\\.gradle\\caches\\transforms-4\\316503c5dcc4c8b61b00057b23c73fda\\transformed\\appcompat-1.6.1\\res\\values-watch-v21\\values-watch-v21.xml",
                     "from": {
                         "startLines": "2,6,10",
                         "startColumns": "4,4,4",

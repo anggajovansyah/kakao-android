@@ -27,6 +27,18 @@ submit ke NocoBase & kirim OTP WhatsApp memakai data palsu/delay simulasi).
 
 Kode OTP mock yang selalu valid: **123456**
 
+## Akun & Hardcoded Bypass Login (Pengembangan Sementara)
+
+Untuk mempermudah pengujian alur (*testing bypass*):
+- **Username default (No. WA / ID)**: `08123456789`
+- **Kata Sandi default**: `admin123`
+- **Kode OTP mock yang selalu valid**: `123456`
+
+### Cara Menghapus / Mengubah Hardcoded Login:
+- **Lokasi Kode**: [`WelcomeScreen.kt`](file:///d:/Berau/kakao-android/app/src/main/java/com/beraucoal/kakao/ui/screens/WelcomeScreen.kt)
+- **Untuk Menghapus (Produksi)**: Ubah `mutableStateOf("08123456789")` dan `mutableStateOf("admin123")` menjadi string kosong `mutableStateOf("")`.
+- **Untuk Mengubah Kredensial**: Ganti nilai string `"08123456789"` atau `"admin123"` di `WelcomeScreen.kt` sesuai kebutuhan testing Anda.
+
 ## Yang perlu diisi sebelum production
 
 - [ ] `RetrofitClient.kt`: ganti `NOCOBASE_BASE_URL` dengan URL instance NocoBase dari tim Backend

@@ -15,6 +15,16 @@ android {
         versionName = "0.1.0"
     }
 
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        getByName("debug") {
+            isMinifyEnabled = false
+        }
+    }
+
     buildFeatures {
         compose = true
     }
@@ -37,6 +47,8 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.8")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
@@ -50,6 +62,9 @@ dependencies {
 
     // ML Kit Text Recognition (on-device, free)
     implementation("com.google.mlkit:text-recognition:16.0.1")
+
+    // ML Kit Object Detection & Tracking (on-device)
+    implementation("com.google.mlkit:object-detection:17.0.2")
 
     // Networking (NocoBase API + WhatsApp OTP provider)
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
