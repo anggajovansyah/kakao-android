@@ -67,3 +67,6 @@ Thumbs.db
 *.keystore
 *.p12
 *.key
+
+# Environment secrets
+.env

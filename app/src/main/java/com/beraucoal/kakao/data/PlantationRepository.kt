@@ -1,9 +1,14 @@
 package com.beraucoal.kakao.data
 
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.PolyUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class PlantationRepository {
 
@@ -37,6 +42,100 @@ class PlantationRepository {
             } else kebun
         }
     }
+
+    fun addSelfMappedKebun(
+        namaKebun: String,
+        namaPemilik: String = "Petani Terverifikasi",
+        idPetani: String = "PETANI-MANDIRI-01",
+        nomorWa: String = "081234567890",
+        luasHektar: Double,
+        polygon: List<LatLng>,
+        catatan: String = ""
+    ): KebunArea {
+        val kebunId = "KEBUN-SELF-${System.currentTimeMillis()}"
+        val center = if (polygon.isNotEmpty()) {
+            val avgLat = polygon.map { it.latitude }.average()
+            val avgLng = polygon.map { it.longitude }.average()
+            LatLng(avgLat, avgLng)
+        } else LatLng(2.1500, 117.4667)
+
+        val isOverlapping = checkOverlap(polygon)
+
+        val defaultBlok = BlokBagian(
+            id = "BLOK-$kebunId-01",
+            kodeBlok = "DEFAULT",
+            namaBlok = "Blok Utama - $namaKebun",
+            polygon = polygon,
+            pohonList = emptyList(),
+            isDefaultBlok = true
+        )
+
+        val newKebun = KebunArea(
+            id = kebunId,
+            namaKebun = namaKebun,
+            namaPemilik = namaPemilik,
+            idPetani = idPetani,
+            nomorWa = nomorWa,
+            luasHektar = (luasHektar * 100.0).toInt() / 100.0,
+            centerLocation = center,
+            polygon = polygon,
+            blokList = listOf(defaultBlok),
+            isSelfMapped = true,
+            verificationStatus = KebunVerificationStatus.PENDING_REVIEW,
+            syncStatus = SyncStatus.PENDING_SYNC,
+            overlapFlag = isOverlapping
+        )
+
+        _kebunList.value = _kebunList.value + newKebun
+        simulateBackgroundSync(kebunId)
+        return newKebun
+    }
+
+    fun addPohonToBlok(kebunId: String, blokId: String, newPohon: PohonKakao): Boolean {
+        var added = false
+        _kebunList.value = _kebunList.value.map { kebun ->
+            if (kebun.id == kebunId) {
+                kebun.copy(
+                    blokList = kebun.blokList.map { blok ->
+                        if (blok.id == blokId) {
+                            added = true
+                            blok.copy(pohonList = blok.pohonList + newPohon)
+                        } else blok
+                    }
+                )
+            } else kebun
+        }
+        return added
+    }
+
+    fun checkOverlap(newPolygon: List<LatLng>, excludeKebunId: String? = null): Boolean {
+        if (newPolygon.isEmpty()) return false
+        val existingKebuns = _kebunList.value.filter { it.id != excludeKebunId && it.polygon.isNotEmpty() }
+        for (existing in existingKebuns) {
+            for (pt in newPolygon) {
+                if (PolyUtil.containsLocation(pt, existing.polygon, true)) {
+                    return true
+                }
+            }
+            for (pt in existing.polygon) {
+                if (PolyUtil.containsLocation(pt, newPolygon, true)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun simulateBackgroundSync(kebunId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(4000)
+            _kebunList.value = _kebunList.value.map { kebun ->
+                if (kebun.id == kebunId) kebun.copy(syncStatus = SyncStatus.SYNCED)
+                else kebun
+            }
+        }
+    }
+
 
     private fun generateMockPlantationData(): List<KebunArea> {
         val baseCenter = LatLng(2.15340, 117.48120) // Bedungun / Tanjung Redeb, Berau
@@ -147,5 +246,67 @@ class PlantationRepository {
             }
         }
         return trees
+    }
+
+    companion object {
+        /**
+         * Algoritma pengecekan perpotongan garis poli-titik (self-intersection).
+         * Digunakan setiap penambahan titik baru saat pemetaan polygon mandiri.
+         */
+        fun hasSelfIntersection(points: List<LatLng>): Boolean {
+            val n = points.size
+            if (n < 4) return false
+            for (i in 0 until n - 1) {
+                val p1 = points[i]
+                val p2 = points[i + 1]
+                for (j in i + 2 until n - 1) {
+                    if (i == 0 && j == n - 2 && points.first() == points.last()) continue
+                    val q1 = points[j]
+                    val q2 = points[j + 1]
+                    if (segmentsIntersect(p1, p2, q1, q2)) {
+                        return true
+                    }
+                }
+            }
+            if (n >= 4) {
+                val last = points.last()
+                val first = points.first()
+                for (i in 1 until n - 2) {
+                    val q1 = points[i]
+                    val q2 = points[i + 1]
+                    if (segmentsIntersect(last, first, q1, q2)) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+
+        private fun orientation(p: LatLng, q: LatLng, r: LatLng): Int {
+            val valResult = (q.longitude - p.longitude) * (r.latitude - q.latitude) -
+                    (q.latitude - p.latitude) * (r.longitude - q.longitude)
+            if (Math.abs(valResult) < 1e-9) return 0
+            return if (valResult > 0) 1 else 2
+        }
+
+        private fun onSegment(p: LatLng, q: LatLng, r: LatLng): Boolean {
+            return q.latitude <= Math.max(p.latitude, r.latitude) && q.latitude >= Math.min(p.latitude, r.latitude) &&
+                    q.longitude <= Math.max(p.longitude, r.longitude) && q.longitude >= Math.min(p.longitude, r.longitude)
+        }
+
+        private fun segmentsIntersect(p1: LatLng, q1: LatLng, p2: LatLng, q2: LatLng): Boolean {
+            val o1 = orientation(p1, q1, p2)
+            val o2 = orientation(p1, q1, q2)
+            val o3 = orientation(p2, q2, p1)
+            val o4 = orientation(p2, q2, q1)
+
+            if (o1 != o2 && o3 != o4) return true
+            if (o1 == 0 && onSegment(p1, p2, q1)) return true
+            if (o2 == 0 && onSegment(p1, q2, q1)) return true
+            if (o3 == 0 && onSegment(p2, p1, q2)) return true
+            if (o4 == 0 && onSegment(p2, q1, q2)) return true
+
+            return false
+        }
     }
 }

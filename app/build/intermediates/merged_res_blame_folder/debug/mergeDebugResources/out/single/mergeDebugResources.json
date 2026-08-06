@@ -1,38 +1,38 @@
 [
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/drawable_itsb_logo.png.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/drawable/itsb_logo.png"
+        "merged": "com.beraucoal.kakao.app-debug-65:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/drawable_berau_logo.png.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/drawable/berau_logo.png"
+        "merged": "com.beraucoal.kakao.app-debug-65:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/drawable/ic_launcher_background.xml"
+        "merged": "com.beraucoal.kakao.app-debug-65:/drawable_splash_icon.png.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/drawable/splash_icon.png"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/drawable/ic_launcher_foreground.xml"
+        "merged": "com.beraucoal.kakao.app-debug-65:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.beraucoal.kakao.app-debug-65:/drawable_ic_leaf_single.xml.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/drawable/ic_leaf_single.xml"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.beraucoal.kakao.app-debug-65:/drawable_berau_logo.png.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/drawable/berau_logo.png"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/drawable_ic_leaf_sprig.xml.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/drawable/ic_leaf_sprig.xml"
+        "merged": "com.beraucoal.kakao.app-debug-65:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/drawable_ic_leaf_single.xml.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/drawable/ic_leaf_single.xml"
+        "merged": "com.beraucoal.kakao.app-debug-65:/drawable_itsb_logo.png.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/drawable/itsb_logo.png"
     },
     {
-        "merged": "com.beraucoal.kakao.app-debug-64:/drawable_splash_icon.png.flat",
-        "source": "com.beraucoal.kakao.app-main-66:/drawable/splash_icon.png"
+        "merged": "com.beraucoal.kakao.app-debug-65:/drawable_ic_leaf_sprig.xml.flat",
+        "source": "com.beraucoal.kakao.app-main-67:/drawable/ic_leaf_sprig.xml"
     }
 ]

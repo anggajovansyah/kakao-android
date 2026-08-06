@@ -9,8 +9,10 @@
         android:targetSdkVersion="34" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -18,9 +20,6 @@
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
-    <!-- For remote config -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
@@ -47,10 +46,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BerauCoalKakao" >
 
-        <!-- Replace with your own Google Maps API key before running -->
+        <!-- Google Maps API key disuntikkan secara dinamis oleh Gradle dari file .env -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_MAPS_API_KEY_HERE" />
+            android:value="AIzaSyAJsSgvYN34FzSTuaZglYhWbuSMaiQ1gyo" />
 
         <activity
             android:name="com.beraucoal.kakao.MainActivity"
@@ -96,7 +95,11 @@
             android:name="com.google.mlkit.common.internal.MlKitInitProvider"
             android:authorities="com.beraucoal.kakao.mlkitinitprovider"
             android:exported="false"
-            android:initOrder="99" /> <!-- Needs to be explicitly declared on P+ -->
+            android:initOrder="99" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" /> <!-- Needs to be explicitly declared on P+ -->
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
@@ -105,10 +108,6 @@
             android:name="com.google.android.gms.common.api.GoogleApiActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
