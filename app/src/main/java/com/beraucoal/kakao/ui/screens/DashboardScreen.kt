@@ -284,7 +284,12 @@ fun DashboardScreen(
                                     .clip(CircleShape)
                                     .background(KakaoColors.SurfaceMuted)
                             ) {
-                                Text("🌱", fontSize = 20.sp)
+                                Icon(
+                                    imageVector = Icons.Filled.CheckCircle,
+                                    contentDescription = null,
+                                    tint = KakaoColors.PrimaryDark,
+                                    modifier = Modifier.size(24.dp)
+                                )
                             }
                             Spacer(Modifier.width(16.dp))
                             Column(modifier = Modifier.weight(1f)) {

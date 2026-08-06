@@ -1,7 +1,23 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+// Membaca rahasia MAPS_API_KEY dari file .env atau local.properties
+val envProperties = Properties()
+val envFile = rootProject.file(".env")
+if (envFile.exists()) {
+    envProperties.load(FileInputStream(envFile))
+}
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    envProperties.load(FileInputStream(localPropertiesFile))
+}
+val mapsApiKey: String = envProperties.getProperty("MAPS_API_KEY") ?: "YOUR_MAPS_API_KEY_HERE"
+
 
 android {
     namespace = "com.beraucoal.kakao"
@@ -13,6 +29,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "0.1.0"
+        manifestPlaceholders["mapsApiKey"] = mapsApiKey
     }
 
     buildTypes {
@@ -74,8 +91,9 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // Maps for kebun mapping (pinning garden location)
-    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    // Maps for kebun mapping (pinning garden location & GIS utilities)
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.maps.android:android-maps-utils:3.8.2")
 }

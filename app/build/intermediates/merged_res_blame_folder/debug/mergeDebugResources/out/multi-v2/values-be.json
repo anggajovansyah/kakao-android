@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.beraucoal.kakao.app-mergeDebugResources-62:/values-be/values-be.xml",
+            "outputFile": "com.beraucoal.kakao.app-mergeDebugResources-63:/values-be/values-be.xml",
             "map": [
                 {
                     "source": "C:\\Users\\angga\\.gradle\\caches\\transforms-4\\db3e207e8cdea149435fa399a0395321\\transformed\\play-services-base-18.5.0\\res\\values-be\\values.xml",

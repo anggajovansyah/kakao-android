@@ -16,6 +16,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen() // splash native (ikon daun di latar hijau) tampil sekilas sebelum Compose ambil alih
         super.onCreate(savedInstanceState)
+
+        try {
+            // Memaksa penggunaan LEGACY renderer untuk menghindari bug RPC timeout pada maps_core di emulator
+            com.google.android.gms.maps.MapsInitializer.initialize(
+                applicationContext,
+                com.google.android.gms.maps.MapsInitializer.Renderer.LEGACY
+            ) { renderer ->
+                android.util.Log.d("KakaoMaps", "Maps SDK initialized with renderer: $renderer")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("KakaoMaps", "Failed to initialize Maps SDK", e)
+        }
+
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier) {
@@ -25,7 +38,11 @@ class MainActivity : ComponentActivity() {
 
                     LaunchedEffect(Unit) {
                         permissionLauncher.launch(
-                            arrayOf(Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION)
+                            arrayOf(
+                                Manifest.permission.CAMERA,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
                         )
                     }
 

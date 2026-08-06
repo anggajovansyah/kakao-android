@@ -6,8 +6,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.beraucoal.kakao.data.PlantationRepository
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,11 +31,13 @@ object Routes {
     const val DASHBOARD = "dashboard"
     const val SATELLITE_MAP = "satellite_map"
     const val PROFILE = "profile"
+    const val SELF_MAPPING = "self_mapping"
 }
 
 @Composable
 fun RegistrationNavGraph(navController: NavHostController = rememberNavController()) {
     val viewModel: RegistrationViewModel = viewModel()
+    val sharedPlantationRepository = remember { PlantationRepository() }
     val maxStepReached by viewModel.maxStepReached.collectAsState()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -103,7 +108,13 @@ fun RegistrationNavGraph(navController: NavHostController = rememberNavControlle
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        val bottomPadding = if (currentRoute == Routes.SATELLITE_MAP) 0.dp else innerPadding.calculateBottomPadding()
+        Box(
+            modifier = Modifier.padding(
+                top = innerPadding.calculateTopPadding(),
+                bottom = bottomPadding
+            )
+        ) {
             NavHost(navController = navController, startDestination = Routes.SPLASH) {
                 composable(Routes.SPLASH) {
                     SplashScreen(
@@ -182,7 +193,17 @@ fun RegistrationNavGraph(navController: NavHostController = rememberNavControlle
                     )
                 }
                 composable(Routes.SATELLITE_MAP) {
-                    SatelliteMapScreen()
+                    SatelliteMapScreen(
+                        plantationRepository = sharedPlantationRepository,
+                        onNavigateToSelfMapping = { navController.navigate(Routes.SELF_MAPPING) }
+                    )
+                }
+                composable(Routes.SELF_MAPPING) {
+                    SelfMappingScreen(
+                        repository = sharedPlantationRepository,
+                        onFinished = { navController.popBackStack() },
+                        onCancel = { navController.popBackStack() }
+                    )
                 }
                 composable(Routes.PROFILE) {
                     ProfileScreen(

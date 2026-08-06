@@ -10,8 +10,10 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -64,7 +66,7 @@ fun KebunMappingScreen(
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = "Ketuk area peta untuk menentukan titik koordinat kebun atau gunakan sensor GPS langsung di lapangan",
+                    text = "Ketuk area peta atau geser (drag) pin untuk menentukan titik koordinat secara manual tanpa perlu berjalan ke lokasi, atau gunakan sensor GPS saat berada di lapangan",
                     style = MaterialTheme.typography.bodySmall,
                     color = KakaoColors.TextSecondary,
                     lineHeight = 20.sp
@@ -82,13 +84,22 @@ fun KebunMappingScreen(
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
-                    properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
+                    properties = MapProperties(isMyLocationEnabled = hasLocationPermission, mapType = MapType.HYBRID),
                     onMapClick = { latLng -> pinnedLocation = latLng }
                 ) {
                     pinnedLocation?.let { loc ->
+                        val markerState = remember { MarkerState(position = loc) }
+                        LaunchedEffect(loc) {
+                            if (markerState.position != loc) markerState.position = loc
+                        }
+                        LaunchedEffect(markerState.position) {
+                            if (pinnedLocation != markerState.position) pinnedLocation = markerState.position
+                        }
                         Marker(
-                            state = MarkerState(position = loc),
-                            title = "Lokasi Kebun Kakao"
+                            state = markerState,
+                            title = "Lokasi Kebun Kakao",
+                            snippet = "Tahan & geser (drag) pin untuk ubah posisi manual",
+                            draggable = true
                         )
                     }
                 }
@@ -136,7 +147,32 @@ fun KebunMappingScreen(
                         leadingIcon = Icons.Filled.Place
                     )
 
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(16.dp))
+                    if (pinnedLocation != null) {
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = KakaoColors.SurfaceMuted,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(14.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("Titik Koordinat Terekam:", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = KakaoColors.PrimaryDark)
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text("Mode: Manual/Drag", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = KakaoColors.Primary)
+                                }
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    String.format("Latitude: %.6f\nLongitude: %.6f", pinnedLocation!!.latitude, pinnedLocation!!.longitude),
+                                    fontSize = 12.sp,
+                                    color = KakaoColors.TextPrimary,
+                                    fontFamily = PoppinsFontFamily
+                                )
+                                Text("Tip: Anda dapat meletakkan & menggeser (drag) pin di atas peta secara manual tanpa harus berjalan ke lokasi.", fontSize = 11.sp, color = KakaoColors.TextSecondary, modifier = Modifier.padding(top = 4.dp))
+                            }
+                        }
+                    } else {
+                        Spacer(Modifier.height(8.dp))
+                    }
 
                     KakaoPrimaryButton(
                         text = if (pinnedLocation != null) "Simpan & Selesaikan Registrasi" else "Pilih Pin Lokasi di Peta",
