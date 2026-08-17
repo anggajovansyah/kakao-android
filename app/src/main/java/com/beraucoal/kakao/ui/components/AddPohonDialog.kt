@@ -24,7 +24,7 @@ import com.beraucoal.kakao.data.*
 import com.beraucoal.kakao.ui.theme.KakaoColors
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.PolyUtil
+import com.beraucoal.kakao.utils.PolyUtil
 
 @Composable
 fun AddPohonDialog(

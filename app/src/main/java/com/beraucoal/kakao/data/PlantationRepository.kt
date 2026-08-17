@@ -1,7 +1,7 @@
 package com.beraucoal.kakao.data
 
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.PolyUtil
+import com.beraucoal.kakao.utils.PolyUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,12 +15,29 @@ class PlantationRepository {
     private val _kebunList = MutableStateFlow<List<KebunArea>>(emptyList())
     val kebunList: StateFlow<List<KebunArea>> = _kebunList.asStateFlow()
 
+    private val _uploadQueue = MutableStateFlow<List<LaporanPohon>>(emptyList())
+    val uploadQueue: StateFlow<List<LaporanPohon>> = _uploadQueue.asStateFlow()
+
+    private val _riwayatLaporan = MutableStateFlow<List<LaporanPohon>>(emptyList())
+    val riwayatLaporan: StateFlow<List<LaporanPohon>> = _riwayatLaporan.asStateFlow()
+
     init {
         _kebunList.value = generateMockPlantationData()
     }
 
     fun getKebunById(kebunId: String): KebunArea? {
         return _kebunList.value.find { it.id == kebunId }
+    }
+
+    fun getPohonById(pohonId: String): PohonKakao? {
+        for (kebun in _kebunList.value) {
+            for (blok in kebun.blokList) {
+                for (pohon in blok.pohonList) {
+                    if (pohon.id == pohonId) return pohon
+                }
+            }
+        }
+        return null
     }
 
     fun updatePohonStatus(kebunId: String, blokId: String, pohonId: String, newStatus: PohonStatus) {
@@ -41,6 +58,37 @@ class PlantationRepository {
                 )
             } else kebun
         }
+    }
+
+    fun saveLaporanPohon(laporan: LaporanPohon) {
+        _uploadQueue.value = _uploadQueue.value + laporan
+    }
+
+    fun syncUploadQueue() {
+        val currentQueue = _uploadQueue.value
+        if (currentQueue.isEmpty()) return
+        
+        // Simulasi pengiriman ke server
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(2000)
+            val syncedReports = currentQueue.map { it.copy(syncStatus = SyncStatus.SYNCED) }
+            _riwayatLaporan.value = _riwayatLaporan.value + syncedReports
+            _uploadQueue.value = emptyList()
+        }
+    }
+
+    fun updateLaporanCatatan(laporanId: String, newCatatan: String) {
+        _uploadQueue.value = _uploadQueue.value.map { laporan ->
+            if (laporan.id == laporanId) laporan.copy(catatan = newCatatan) else laporan
+        }
+        _riwayatLaporan.value = _riwayatLaporan.value.map { laporan ->
+            if (laporan.id == laporanId) laporan.copy(catatan = newCatatan) else laporan
+        }
+    }
+
+    fun getLaporanById(laporanId: String): LaporanPohon? {
+        return _uploadQueue.value.find { it.id == laporanId }
+            ?: _riwayatLaporan.value.find { it.id == laporanId }
     }
 
     fun addSelfMappedKebun(

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.beraucoal.kakao.app-mergeDebugResources-63:/values-v31/values-v31.xml",
+            "outputFile": "com.beraucoal.kakao.app-mergeDebugResources-62:/values-v31/values-v31.xml",
             "map": [
                 {
                     "source": "C:\\Users\\angga\\.gradle\\caches\\transforms-4\\08a5c87c8b8ae2e447c478574aaf3a93\\transformed\\core-splashscreen-1.0.1\\res\\values-v31\\values-v31.xml",

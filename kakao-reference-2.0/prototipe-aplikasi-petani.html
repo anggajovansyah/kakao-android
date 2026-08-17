@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Kakao · Prototipe Aplikasi Petani</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Hijau kanopi kakao sebagai warna utama; kuning-merah buah matang sebagai
+     tangga status — sama persis dengan yang dipakai dashboard, supaya petani
+     dan penyuluh melihat warna yang sama untuk hal yang sama. */
+  --hijau:#175c40; --hijau-tua:#0f3d2b; --hijau-muda:#e7f2ec;
+  --sehat:#2e9e5b; --pantau:#e0a12a; --rawat:#e0703b; --kritis:#c0392b; --kosong:#8a9a94;
+  --kertas:#f2f5f2; --kartu:#ffffff; --garis:#dfe6e1;
+  --teks:#132019; --teks2:#5b6f66; --teks3:#8a9a94;
+  --lebar:392px; --tinggi:844px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  background:#20302a;color:var(--teks);
+  font:400 15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif;
+  display:grid;grid-template-columns:1fr auto 1fr;gap:26px;
+  align-items:center;justify-items:center;padding:22px;overflow:auto;
+}
+.mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+/* ── panel penjelas kiri/kanan ── */
+.samping{max-width:280px;color:#c6d5cd;font-size:12.5px;line-height:1.6;align-self:start;padding-top:30px}
+.samping h2{font-size:14px;font-weight:800;color:#fff;margin:0 0 10px;letter-spacing:-.01em}
+.samping h3{font-size:11px;font-weight:700;color:#8fb3a2;text-transform:uppercase;letter-spacing:.12em;margin:20px 0 7px}
+.samping p{margin:0 0 10px}
+.samping ol{margin:0;padding-left:17px}
+.samping li{margin-bottom:7px;cursor:pointer}
+.samping li:hover{color:#fff}
+.samping li b{color:#fff;font-weight:600}
+.samping .note{border-left:2px solid #3d6b56;padding-left:11px;color:#9fbdae;font-size:11.5px}
+
+/* ── bingkai HP ── */
+.hp{
+  width:var(--lebar);height:var(--tinggi);background:#000;border-radius:42px;
+  padding:11px;box-shadow:0 26px 60px rgba(0,0,0,.55),0 0 0 2px #3a4a43;position:relative;flex:0 0 auto;
+}
+.layar{
+  width:100%;height:100%;background:var(--kertas);border-radius:32px;overflow:hidden;
+  position:relative;display:flex;flex-direction:column;
+}
+.poni{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:104px;height:26px;background:#000;border-radius:0 0 15px 15px;z-index:60}
+.statusbar{
+  height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px 0;font:600 12px/1 "Plus Jakarta Sans";color:var(--teks);z-index:50;
+}
+.statusbar.terang{color:#fff}
+.statusbar .kanan{display:flex;gap:5px;align-items:center}
+
+.isi{flex:1;overflow-y:auto;overflow-x:hidden;position:relative;scrollbar-width:none}
+.isi::-webkit-scrollbar{display:none}
+
+/* ── komponen ── */
+.pad{padding:0 20px}
+h1.judul{font-size:25px;font-weight:800;letter-spacing:-.028em;line-height:1.15;margin:0 0 6px}
+h2.sub{font-size:17px;font-weight:700;letter-spacing:-.015em;margin:22px 0 10px}
+.kecil{font-size:13px;color:var(--teks2);line-height:1.5}
+.mini{font-size:11.5px;color:var(--teks3)}
+.eyebrow{font:700 10.5px/1 "Plus Jakarta Sans";letter-spacing:.15em;text-transform:uppercase;color:var(--teks3)}
+
+.tbl{
+  display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+  padding:16px;border-radius:15px;border:0;font:700 15.5px/1 "Plus Jakarta Sans";
+  cursor:pointer;background:var(--hijau);color:#fff;transition:transform .1s,filter .15s;
+}
+.tbl:active{transform:scale(.975)}
+.tbl:disabled{background:#c3d0c9;color:#8a9a94;cursor:not-allowed}
+.tbl.garis{background:transparent;color:var(--hijau);border:1.6px solid var(--hijau)}
+.tbl.halus{background:var(--hijau-muda);color:var(--hijau-tua)}
+.tbl.putih{background:#fff;color:var(--hijau);border:1.6px solid var(--garis)}
+.tbl.mrh{background:var(--kritis)}
+
+.kartu{background:var(--kartu);border-radius:17px;padding:16px;border:1px solid var(--garis)}
+.kartu+.kartu{margin-top:11px}
+
+.isian{width:100%;padding:15px 16px;border:1.6px solid var(--garis);border-radius:13px;
+  font:500 16px/1 "Plus Jakarta Sans";background:#fff;color:var(--teks)}
+.isian:focus{outline:none;border-color:var(--hijau);box-shadow:0 0 0 3px rgba(23,92,64,.13)}
+.isian::placeholder{color:#a9b8b1;font-weight:400}
+label.lbl{display:block;font:600 12.5px/1 "Plus Jakarta Sans";color:var(--teks2);margin:16px 0 7px}
+
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;
+  font:600 11.5px/1 "Plus Jakarta Sans";background:var(--hijau-muda);color:var(--hijau-tua)}
+.chip.abu{background:#eceeed;color:var(--teks2)}
+.chip.mrh{background:#fbeae7;color:var(--kritis)}
+.chip.kun{background:#fdf3e0;color:#95681a}
+
+.badge-status{display:inline-flex;align-items:center;gap:6px;font:700 12px/1 "Plus Jakarta Sans"}
+.titik{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+
+/* header hijau */
+.hero{background:var(--hijau);color:#fff;padding:4px 20px 26px;border-radius:0 0 26px 26px}
+.hero h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
+.hero .kecil{color:#b7d4c5}
+
+/* cuaca */
+.cuaca{display:flex;gap:8px;margin-top:14px}
+.chari{flex:1;background:rgba(255,255,255,.13);border-radius:13px;padding:11px 8px;text-align:center}
+.chari.kini{background:#fff;color:var(--hijau-tua)}
+.chari .hh{font:700 11px/1 "Plus Jakarta Sans";opacity:.8;margin-bottom:7px}
+.chari .ik{font-size:23px;line-height:1;margin-bottom:6px}
+.chari .sh{font:700 14px/1 "Plus Jakarta Sans"}
+.chari .hj{font:600 10.5px/1 "Plus Jakarta Sans";opacity:.75;margin-top:5px}
+.saran{background:#fff8e8;border:1px solid #f0dfb8;border-radius:13px;padding:12px 14px;margin-top:12px;
+  font-size:12.5px;line-height:1.5;color:#7a5a12;display:flex;gap:9px}
+
+/* kebun */
+.kebun{display:flex;gap:13px;align-items:center;padding:14px 15px;background:#fff;border:1px solid var(--garis);
+  border-radius:16px;margin-bottom:9px;cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}
+.kebun:active{transform:scale(.99)}
+.cincin{width:46px;height:46px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+  font:800 14px/1 "Plus Jakarta Sans";color:#fff}
+
+/* bottom nav */
+.nav{flex:0 0 auto;display:flex;background:#fff;border-top:1px solid var(--garis);padding:8px 4px 22px}
+.nav button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:6px 0;cursor:pointer;color:var(--teks3);font:600 10.5px/1 "Plus Jakarta Sans"}
+.nav button.on{color:var(--hijau)}
+.nav svg{width:23px;height:23px}
+
+/* kamera */
+.kamera{position:absolute;inset:0;background:#0d1512;display:flex;flex-direction:column}
+.viewfinder{flex:1;position:relative;overflow:hidden;
+  background:linear-gradient(165deg,#2f4a2c,#1b3320 45%,#243d26)}
+.daun{position:absolute;border-radius:50% 8% 50% 8%;opacity:.5}
+.pod{position:absolute;border-radius:48% 48% 42% 42%;box-shadow:inset -7px -9px 16px rgba(0,0,0,.35)}
+.bingkai-ktp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:80%;aspect-ratio:1.586;border:2.5px solid #fff;border-radius:11px;
+  box-shadow:0 0 0 2000px rgba(0,0,0,.55)}
+.bingkai-ktp span{position:absolute;width:22px;height:22px;border:3.5px solid var(--pantau)}
+.sudut-kika{top:-3px;left:-3px;border-right:0;border-bottom:0;border-radius:9px 0 0 0}
+.sudut-kaka{top:-3px;right:-3px;border-left:0;border-bottom:0;border-radius:0 9px 0 0}
+.sudut-kiba{bottom:-3px;left:-3px;border-right:0;border-top:0;border-radius:0 0 0 9px}
+.sudut-kaba{bottom:-3px;right:-3px;border-left:0;border-top:0;border-radius:0 0 9px 0}
+.gps{position:absolute;top:14px;left:14px;right:14px;background:rgba(8,18,14,.82);backdrop-filter:blur(8px);
+  border-radius:13px;padding:10px 13px;color:#fff;font-size:11.5px;display:flex;gap:9px;align-items:center}
+.gps.ok{border-left:3px solid var(--sehat)}
+.gps.luar{border-left:3px solid var(--rawat)}
+.gps.cari{border-left:3px solid var(--pantau)}
+.rana{flex:0 0 auto;background:#0d1512;padding:16px 24px 30px;display:flex;align-items:center;justify-content:space-between}
+.tombol-rana{width:70px;height:70px;border-radius:50%;background:#fff;border:5px solid rgba(255,255,255,.32);cursor:pointer}
+.tombol-rana:active{transform:scale(.93)}
+.tombol-rana:disabled{opacity:.35;cursor:not-allowed}
+.organ-pilih{display:flex;gap:7px;padding:11px 16px;background:#0d1512;justify-content:center}
+.organ-pilih button{padding:9px 15px;border-radius:20px;border:1.5px solid rgba(255,255,255,.3);
+  background:transparent;color:#fff;font:600 12.5px/1 "Plus Jakarta Sans";cursor:pointer}
+.organ-pilih button.on{background:#fff;color:var(--hijau-tua);border-color:#fff}
+
+/* hasil */
+.foto-hasil{position:relative;border-radius:15px;overflow:hidden;aspect-ratio:4/3;
+  background:linear-gradient(160deg,#3a5c33,#20401f 55%,#2b4a28)}
+.kotak{position:absolute;border:2.5px solid;border-radius:5px}
+.kotak b{position:absolute;top:-21px;left:-2.5px;font:700 10px/1 "Plus Jakarta Sans";
+  padding:3px 6px;border-radius:4px 4px 0 0;color:#fff;white-space:nowrap}
+
+/* peta mini */
+.peta{position:relative;height:168px;border-radius:15px;overflow:hidden;background:#dfe8e0}
+.peta svg{position:absolute;inset:0;width:100%;height:100%}
+
+/* daftar antrean */
+.baris{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--garis)}
+.kotak-kecil{width:44px;height:44px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;font-size:19px;
+  background:linear-gradient(150deg,#3a5c33,#22401f)}
+
+.tumpuk{display:flex;flex-direction:column;gap:9px}
+.progres{height:6px;background:#e3eae5;border-radius:5px;overflow:hidden}
+.progres i{display:block;height:100%;background:var(--hijau);border-radius:5px;transition:width .5s}
+
+.toast{position:absolute;left:16px;right:16px;bottom:96px;background:#132019;color:#fff;
+  padding:13px 16px;border-radius:13px;font-size:13px;z-index:70;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.lembar{position:absolute;inset:0;background:rgba(10,20,15,.5);z-index:80;display:flex;align-items:flex-end}
+.lembar-isi{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:10px 20px 28px;max-height:88%;overflow-y:auto}
+.pegangan{width:38px;height:4px;background:var(--garis);border-radius:3px;margin:0 auto 16px}
+
+.pin-titik{display:flex;gap:13px;justify-content:center;margin:26px 0 30px}
+.pin-titik i{width:15px;height:15px;border-radius:50%;border:2px solid var(--hijau);display:block}
+.pin-titik i.isi{background:var(--hijau)}
+.tuts{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.tuts button{padding:17px 0;border-radius:14px;border:0;background:#fff;border:1px solid var(--garis);
+  font:600 21px/1 "Plus Jakarta Sans";cursor:pointer;color:var(--teks)}
+.tuts button:active{background:var(--hijau-muda)}
+.tuts button.kosong{background:none;border:0;cursor:default}
+
+@media (max-width:1080px){ body{grid-template-columns:1fr} .samping{display:none} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<aside class="samping">
+  <h2>Prototipe aplikasi petani</h2>
+  <p>Klik untuk mencoba. Semua data memakai contoh nyata dari master 147 petani —
+     Dominikus Ambus, Suaran, BMO.</p>
+  <h3>Alur pendaftaran</h3>
+  <ol>
+    <li data-goto="mulai"><b>Selamat datang</b> — daftar atau masuk</li>
+    <li data-goto="ktp"><b>Pindai KTP</b> — OCR di HP, tanpa internet</li>
+    <li data-goto="ktp-hasil"><b>Periksa hasil bacaan</b></li>
+    <li data-goto="tunggu"><b>Menunggu verifikasi admin</b></li>
+    <li data-goto="masuk"><b>Masuk</b> — nama + kode petani</li>
+    <li data-goto="pin"><b>Buat PIN</b></li>
+  </ol>
+  <h3>Pemakaian harian</h3>
+  <ol>
+    <li data-goto="beranda"><b>Beranda</b> — kondisi kebun + cuaca</li>
+    <li data-goto="kamera"><b>Ambil foto</b> — GPS aktif</li>
+    <li data-goto="hasil"><b>Hasil analisis</b></li>
+    <li data-goto="antrean"><b>Antrean kirim</b> — saat sinyal lemah</li>
+    <li data-goto="kebun"><b>Detail kebun</b> — peta poligon</li>
+  </ol>
+  <p class="note">Prototipe ini menjalankan alur dan tampilan yang sebenarnya.
+     Kamera, GPS, dan hasil AI disimulasikan.</p>
+</aside>
+
+<div class="hp">
+  <div class="poni"></div>
+  <div class="layar">
+    <div class="statusbar" id="sb">
+      <span class="mono">07.42</span>
+      <span class="kanan mono">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor"><rect x="0" y="7" width="2.6" height="4" rx=".6"/><rect x="4" y="4.5" width="2.6" height="6.5" rx=".6"/><rect x="8" y="2" width="2.6" height="9" rx=".6" opacity=".35"/><rect x="12" y="0" width="2.6" height="11" rx=".6" opacity=".35"/></svg>
+        <span style="font-size:10px">78%</span>
+      </span>
+    </div>
+    <div class="isi" id="isi"></div>
+    <div id="navwrap"></div>
+  </div>
+</div>
+
+<aside class="samping" id="catatan"></aside>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Prototipe aplikasi petani AI Kakao.
+   Satu berkas, tanpa build. Semua layar dan alurnya nyata; kamera, GPS, dan
+   inferensi disimulasikan.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const WARNA = {sehat:'#2e9e5b', pantau:'#e0a12a', perlu_perawatan:'#e0703b',
+               kritis:'#c0392b', belum_ada_data:'#8a9a94'};
+const LABEL = {sehat:'Sehat', pantau:'Perlu dipantau', perlu_perawatan:'Perlu perawatan',
+               kritis:'Kritis', belum_ada_data:'Belum diperiksa'};
+
+const S = {
+  layar: 'mulai', tab: 'beranda', pin: '', organ: 'buah', gps: 'cari',
+  ktpTerbaca: 0, kirimProgres: 0, toast: null,
+  petani: {nama:'Dominikus Ambus', kode:'PTN-00031-9', kampung:'Suaran', site:'BMO'},
+  kebun: [
+    {id:1, nama:'Kebun 1 — Suaran', kode:'KBN-00001-3', ha:1.0, status:'perlu_perawatan',
+     umur:6, masalah:'Busuk buah', foto:14},
+    {id:2, nama:'Kebun 2 — Suaran', kode:'KBN-00088-4', ha:0.75, status:'sehat',
+     umur:2, masalah:null, foto:9},
+  ],
+  kebunAktif: 1,
+  cuaca: [
+    {hari:'Hari ini', ik:'🌧️', min:24, maks:29, hujan:82, kondisi:'Hujan Sedang'},
+    {hari:'Besok',    ik:'⛅', min:24, maks:32, hujan:35, kondisi:'Cerah Berawan'},
+    {hari:'Lusa',     ik:'🌦️', min:23, maks:31, hujan:55, kondisi:'Hujan Lokal'},
+  ],
+  antrean: [
+    {organ:'buah', kebun:'Kebun 1', jam:'07.12', status:'kirim', pct:60},
+    {organ:'daun', kebun:'Kebun 1', jam:'07.10', status:'antre'},
+    {organ:'batang', kebun:'Kebun 1', jam:'07.08', status:'antre'},
+  ],
+  riwayat: [
+    {organ:'buah', kebun:'Kebun 1', tgl:'Kemarin, 16.40', kelas:'Busuk buah', warna:'kritis'},
+    {organ:'buah', kebun:'Kebun 1', tgl:'Kemarin, 16.38', kelas:'Buah sehat', warna:'sehat'},
+    {organ:'daun', kebun:'Kebun 2', tgl:'3 Agu, 08.15', kelas:'Daun sehat', warna:'sehat'},
+    {organ:'buah', kebun:'Kebun 2', tgl:'1 Agu, 07.55', kelas:'PBK', warna:'perlu_perawatan'},
+  ],
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function ke(layar){ S.layar = layar; if(layar==='beranda') S.tab='beranda'; gambar(); $('isi').scrollTop = 0; }
+function toast(t){ S.toast = t; gambar(); setTimeout(()=>{ S.toast=null; gambar(); }, 2600); }
+
+/* ── ikon ── */
+const IK = {
+  beranda:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>',
+  kamera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v12H4z"/><circle cx="12" cy="14" r="3.6"/></svg>',
+  antrean:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="m7.5 10 4.5 4.5 4.5-4.5"/><path d="M4 17v3h16v-3"/></svg>',
+  riwayat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2"/></svg>',
+  akun:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.2-3.8 4-5.8 7.5-5.8s6.3 2 7.5 5.8"/></svg>',
+};
+const ORGAN_IK = {buah:'🥥', daun:'🍃', batang:'🪵', tanah:'🪨', alat_spad:'📟'};
+
+/* ── kerangka ── */
+function gambar(){
+  const L = LAYAR[S.layar] || LAYAR.mulai;
+  $('sb').className = 'statusbar' + (L.terang ? ' terang' : '');
+  $('isi').innerHTML = L.html();
+  $('navwrap').innerHTML = L.nav ? navHtml() : '';
+  if (S.toast) $('isi').insertAdjacentHTML('beforeend', `<div class="toast">${esc(S.toast)}</div>`);
+  if (L.sesudah) L.sesudah();
+  $('catatan').innerHTML = L.catatan || '';
+}
+
+function navHtml(){
+  const t = [['beranda','Beranda'],['kamera','Foto'],['antrean','Kirim'],['riwayat','Riwayat'],['akun','Akun']];
+  return `<div class="nav">${t.map(([k,l])=>`
+    <button class="${S.tab===k?'on':''}" data-tab="${k}">${IK[k]}<span>${l}</span></button>`).join('')}</div>`;
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-tab]');
+  if (t) {
+    S.tab = t.dataset.tab;
+    S.layar = {beranda:'beranda', kamera:'kamera', antrean:'antrean', riwayat:'riwayat', akun:'akun'}[S.tab];
+    if (S.layar === 'kamera') { S.gps = 'cari'; setTimeout(()=>{ S.gps='ok'; gambar(); }, 1500); }
+    return gambar();
+  }
+  const g = e.target.closest('[data-goto]');
+  if (g) return ke(g.dataset.goto);
+  const a = e.target.closest('[data-aksi]');
+  if (a) return AKSI[a.dataset.aksi]?.(a);
+});
+
+/* ═══ LAYAR ═══════════════════════════════════════════════════════════════ */
+const LAYAR = {};
+
+/* ── 1. Selamat datang ── */
+LAYAR.mulai = {
+  terang: true,
+  catatan: `<h2>Layar pertama</h2>
+    <p>Hanya dua pilihan. Petani yang belum punya akun tidak perlu memahami
+       istilah apa pun — cukup memilih yang sesuai dengan keadaannya.</p>
+    <p class="note">Tidak ada pendaftaran mandiri lewat email atau kata sandi.
+       Identitas petani sudah ada di master hasil survei; yang perlu dibuktikan
+       hanyalah bahwa orang yang memegang HP adalah orang tersebut.</p>`,
+  html: () => `
+  <div style="background:linear-gradient(170deg,#175c40,#0f3d2b);min-height:100%;color:#fff;
+              display:flex;flex-direction:column;padding:0 26px 34px">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center">
+      <div style="font-size:62px;line-height:1;margin-bottom:20px">🌱</div>
+      <h1 style="font-size:31px;font-weight:800;letter-spacing:-.03em;margin:0 0 10px">AI Kakao</h1>
+      <p style="color:#a9cdb9;font-size:14.5px;line-height:1.6;margin:0 26px">
+        Foto buah, batang, dan daun kakao Anda.<br>Ketahui kondisinya hari itu juga.</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:26px;flex-wrap:wrap">
+        <span class="chip" style="background:rgba(255,255,255,.15);color:#d8ebe0">PT Berau Coal</span>
+        <span class="chip" style="background:rgba(255,255,255,.15);color:#d8ebe0">ITSB</span>
+      </div>
+    </div>
+    <div class="tumpuk">
+      <button class="tbl" style="background:#fff;color:var(--hijau-tua)" data-goto="ktp">Daftar Baru</button>
+      <button class="tbl garis" style="border-color:rgba(255,255,255,.45);color:#fff" data-goto="masuk">Sudah Punya Kode</button>
+      <p style="text-align:center;color:#8fb3a2;font-size:12px;margin:8px 0 0">
+        Belum punya kode? Pilih <b style="color:#fff">Daftar Baru</b> dan siapkan KTP.</p>
+    </div>
+  </div>`,
+};
+
+/* ── 2. Pindai KTP ── */
+LAYAR.ktp = {
+  terang: true,
+  catatan: `<h2>Pindai KTP</h2>
+    <p>OCR berjalan <b>di HP</b> memakai ML Kit — tanpa internet, tanpa biaya per
+       pindaian, dan foto KTP tidak perlu keluar dari HP sebelum petani menyetujuinya.</p>
+    <h3>Yang membuatnya andal</h3>
+    <p>NIK memuat tanggal lahir dan jenis kelamin. Server mencocokkannya dengan
+       kolom "Tempat/Tgl Lahir" yang dibaca terpisah. Dua pembacaan yang sepakat
+       jauh lebih kuat daripada skor kepercayaan OCR.</p>
+    <p class="note">Kalau tidak sepakat, hampir pasti ada digit yang salah baca —
+       dan pendaftaran otomatis dilempar ke verifikasi manual.</p>`,
+  html: () => {
+    const kolom = [
+      {k:'NIK', v:'6403 05 1506 78 0002'},
+      {k:'Nama', v:'DOMINIKUS AMBUS'},
+      {k:'Tempat/Tgl Lahir', v:'BERAU, 15-06-1978'},
+      {k:'Kel/Desa', v:'SUARAN'},
+    ];
+    return `
+  <div class="kamera">
+    <div class="viewfinder">
+      <div style="position:absolute;inset:0;background:
+        linear-gradient(150deg,#5b6b5e,#3d4b41 60%,#4a5a4e)"></div>
+      <div class="bingkai-ktp">
+        <span class="sudut-kika"></span><span class="sudut-kaka"></span>
+        <span class="sudut-kiba"></span><span class="sudut-kaba"></span>
+        <div style="position:absolute;inset:9px;background:linear-gradient(158deg,#dfe6ea,#c9d4da);
+                    border-radius:7px;padding:8px 9px;font-size:5.6px;line-height:1.65;color:#2b3a44;
+                    font-family:'JetBrains Mono',monospace;overflow:hidden">
+          <div style="text-align:center;font-weight:700;font-size:6px">PROVINSI KALIMANTAN TIMUR</div>
+          <div style="text-align:center;font-weight:700;font-size:6px;margin-bottom:4px">KABUPATEN BERAU</div>
+          <div>NIK : 6403051506780002</div>
+          <div>Nama : DOMINIKUS AMBUS</div>
+          <div>Tempat/Tgl Lahir : BERAU, 15-06-1978</div>
+          <div>Jenis Kelamin : LAKI-LAKI</div>
+          <div>Alamat : JL. POROS SUARAN</div>
+          <div>Kel/Desa : SUARAN</div>
+          <div>Kecamatan : SAMBALIUNG</div>
+          <div>Pekerjaan : PETANI/PEKEBUN</div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:20px;left:20px;right:20px;text-align:center;color:#fff">
+        <p style="font-size:13.5px;font-weight:600;margin:0 0 4px">Letakkan KTP di dalam bingkai</p>
+        <p style="font-size:11.5px;color:#c9d8cf;margin:0">Permukaan rata, hindari pantulan cahaya</p>
+      </div>
+    </div>
+    <div style="background:#0d1512;padding:14px 18px 8px">
+      <div class="eyebrow" style="color:#7d938a;margin-bottom:9px">Terbaca langsung di HP</div>
+      <div class="tumpuk" style="gap:6px">
+        ${kolom.map((c,i)=>`
+        <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px;
+                    color:${i<S.ktpTerbaca?'#fff':'#3f5349'};transition:color .3s">
+          <span style="color:${i<S.ktpTerbaca?'#8fb3a2':'#3f5349'}">${c.k}</span>
+          <span class="mono" style="font-weight:500">${i<S.ktpTerbaca?esc(c.v):'— — —'}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="rana">
+      <button class="tbl garis" style="width:auto;padding:12px 15px;border-color:rgba(255,255,255,.3);color:#fff"
+              data-goto="mulai">Batal</button>
+      <button class="tombol-rana" data-aksi="jepretKtp" ${S.ktpTerbaca<4?'disabled':''}></button>
+      <div style="width:74px;text-align:right;color:${S.ktpTerbaca>=4?'#2e9e5b':'#7d938a'};
+                  font:700 11px/1.3 'Plus Jakarta Sans'">
+        ${S.ktpTerbaca>=4?'Siap<br>difoto':'Membaca…'}</div>
+    </div>
+  </div>`;
+  },
+  sesudah: () => {
+    if (S.ktpTerbaca < 4) {
+      clearTimeout(window._ktpT);
+      window._ktpT = setTimeout(() => { S.ktpTerbaca++; if (S.layar==='ktp') gambar(); }, 550);
+    }
+  },
+};
+
+/* ── 3. Hasil bacaan KTP ── */
+LAYAR['ktp-hasil'] = {
+  catatan: `<h2>Konfirmasi sebelum kirim</h2>
+    <p>Petani melihat apa yang terbaca dan bisa membetulkannya sebelum apa pun
+       dikirim. Ini mengurangi beban verifikator sekaligus menghormati bahwa
+       datanya milik petani.</p>
+    <h3>Kecocokan otomatis</h3>
+    <p>Server mencocokkan nama KTP ke master 147 petani. Kolom <b>Kel/Desa</b>
+       dipakai sebagai pemutus — itulah yang membedakan "Jupri" di Birang dari
+       "Pak Jupri" di Pegat Bukur, dua orang berbeda berjarak 16,8 km.</p>
+    <p class="note">Dengan kampung ikut dipakai, 143 dari 147 nama cocok otomatis.
+       Empat sisanya memang harus dilihat manusia.</p>`,
+  html: () => {
+    const baris = [
+      ['NIK', '6403 •••• •••• 0002', true],
+      ['Nama', 'DOMINIKUS AMBUS', true],
+      ['Tempat, tgl lahir', 'BERAU, 15 Juni 1978', true],
+      ['Jenis kelamin', 'Laki-laki', true],
+      ['Alamat', 'Jl. Poros Suaran', true],
+      ['Kel/Desa', 'SUARAN', true],
+      ['Kecamatan', 'SAMBALIUNG', true],
+      ['Pekerjaan', 'PETANI/PEKEBUN', true],
+    ];
+    return `
+  <div class="pad" style="padding-top:18px;padding-bottom:26px">
+    <button class="tbl putih" style="width:auto;padding:9px 14px;font-size:13px;margin-bottom:16px"
+            data-aksi="ulangKtp">← Foto ulang</button>
+    <h1 class="judul">Periksa data Anda</h1>
+    <p class="kecil">Pastikan semuanya sesuai dengan KTP. Betulkan bila ada yang keliru.</p>
+
+    <div class="kartu" style="margin-top:18px;border-color:#bde0c9;background:#f3faf5">
+      <div style="display:flex;gap:11px;align-items:flex-start">
+        <span style="font-size:19px">✅</span>
+        <div>
+          <div style="font-weight:700;font-size:13.5px;color:#1c7a45">Semua kolom terbaca jelas</div>
+          <div class="kecil" style="margin-top:3px">Tanggal lahir di KTP cocok dengan yang tersimpan
+            di dalam NIK — pembacaan bisa dipercaya.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kartu" style="margin-top:11px;padding:6px 16px">
+      ${baris.map(([k,v]) => `
+      <div style="display:flex;justify-content:space-between;gap:12px;padding:11px 0;
+                  border-bottom:1px solid var(--garis)">
+        <span class="kecil" style="flex:0 0 42%">${esc(k)}</span>
+        <span style="font-size:13.5px;font-weight:600;text-align:right">${esc(v)}</span>
+      </div>`).join('').replace(/border-bottom:1px solid var\(--garis\)(?![\s\S]*border-bottom)/, 'border-bottom:0')}
+    </div>
+
+    <div class="kartu" style="margin-top:11px;border-color:#cfe3d8;background:var(--hijau-muda)">
+      <div class="eyebrow" style="color:#3d7a5c">Cocok dengan data survei</div>
+      <div style="font-size:16.5px;font-weight:800;margin:7px 0 2px">Dominikus Ambus</div>
+      <div class="kecil">Kampung Suaran · Site BMO · 1 kebun terdaftar · 1,0 ha</div>
+    </div>
+
+    <label class="lbl">Nomor HP yang bisa dihubungi</label>
+    <input class="isian" type="tel" value="0812 3456 7890" inputmode="tel">
+
+    <div style="margin-top:20px" class="tumpuk">
+      <button class="tbl" data-aksi="kirimKtp">Kirim untuk Diverifikasi</button>
+      <p class="mini" style="text-align:center;line-height:1.55;margin:2px 8px 0">
+        Foto KTP Anda hanya dilihat petugas verifikasi, lalu <b>dihapus</b> setelah
+        pendaftaran disetujui.</p>
+    </div>
+  </div>`;
+  },
+};
+
+/* ── 4. Menunggu ── */
+LAYAR.tunggu = {
+  catatan: `<h2>Layar tunggu</h2>
+    <p>Aplikasi memeriksa status secara berkala dengan jeda menaik: 30 detik,
+       lalu 2 menit, lalu 10 menit. Sengaja hemat — kuota data di lokasi mahal.</p>
+    <p class="note">Petani diberi tahu apa yang sedang terjadi dan berapa lama
+       biasanya. Layar tunggu tanpa keterangan membuat orang mengulang
+       pendaftaran berkali-kali.</p>`,
+  html: () => `
+  <div class="pad" style="padding-top:44px;text-align:center">
+    <div style="width:96px;height:96px;border-radius:50%;background:var(--hijau-muda);
+                display:grid;place-items:center;margin:0 auto 22px;font-size:41px">⏳</div>
+    <h1 class="judul">Menunggu verifikasi</h1>
+    <p class="kecil" style="margin:0 18px">Petugas sedang memeriksa KTP Anda.
+       Biasanya selesai kurang dari 1×24 jam.</p>
+
+    <div class="kartu" style="margin-top:26px;text-align:left">
+      ${[['Data KTP terkirim','selesai'],['Diperiksa petugas','jalan'],['Kode petani aktif','nanti']]
+        .map(([t,st]) => `
+      <div style="display:flex;gap:12px;align-items:center;padding:9px 0">
+        <span style="width:25px;height:25px;border-radius:50%;display:grid;place-items:center;
+          font-size:13px;flex:0 0 auto;
+          background:${st==='selesai'?'var(--sehat)':st==='jalan'?'var(--pantau)':'#e6ebe8'};
+          color:${st==='nanti'?'#a9b8b1':'#fff'}">${st==='selesai'?'✓':st==='jalan'?'•':'○'}</span>
+        <span style="font-size:14px;font-weight:${st==='nanti'?'400':'600'};
+          color:${st==='nanti'?'var(--teks3)':'var(--teks)'}">${t}</span>
+      </div>`).join('')}
+    </div>
+
+    <div class="kartu" style="margin-top:11px;text-align:left;background:#f7f9f8">
+      <div class="eyebrow">Nomor pendaftaran</div>
+      <div class="mono" style="font-size:14px;font-weight:600;margin-top:5px">DFT-2026-0831</div>
+      <div class="kecil" style="margin-top:7px">Sebutkan nomor ini bila menghubungi petugas lapangan.</div>
+    </div>
+
+    <div class="tumpuk" style="margin-top:22px">
+      <button class="tbl halus" data-aksi="cekStatus">Periksa Sekarang</button>
+      <button class="tbl putih" data-goto="mulai">Kembali</button>
+    </div>
+  </div>`,
+};
+
+/* ── 5. Masuk ── */
+LAYAR.masuk = {
+  catatan: `<h2>Masuk</h2>
+    <p>Hanya nama dan kode petani, sesuai permintaan. Kodenya tercetak di kartu
+       petani yang dibagikan penyuluh.</p>
+    <h3>Yang perlu diketahui</h3>
+    <p>Kode PTN-00001 sampai PTN-00147 mudah ditebak, dan nama petani ada di
+       shapefile. Karena itu kode saja tidak cukup: <b>perangkat pertama
+       mengikat</b>, dan kode yang sama di HP lain perlu izin admin.</p>
+    <p class="note">Ditambah PIN dan pembatasan 5 percobaan per jam. Petani jujur
+       tidak merasakan apa pun; penebak kode berhenti di percobaan keenam.</p>`,
+  html: () => `
+  <div class="pad" style="padding-top:30px">
+    <button class="tbl putih" style="width:auto;padding:9px 14px;font-size:13px;margin-bottom:22px"
+            data-goto="mulai">←</button>
+    <h1 class="judul">Masuk</h1>
+    <p class="kecil">Gunakan nama dan kode yang tertera di kartu petani Anda.</p>
+
+    <label class="lbl">Nama lengkap</label>
+    <input class="isian" id="in-nama" value="Dominikus Ambus" autocomplete="name">
+
+    <label class="lbl">Kode petani</label>
+    <input class="isian mono" id="in-kode" value="PTN-00031-9"
+           style="letter-spacing:.06em;font-size:17px" autocomplete="off">
+    <p class="mini" style="margin-top:8px;line-height:1.5">
+      Terletak di bagian bawah kartu petani, diawali <b>PTN</b>.</p>
+
+    <div style="margin-top:24px" class="tumpuk">
+      <button class="tbl" data-aksi="masuk">Masuk</button>
+      <button class="tbl putih" data-goto="ktp">Belum punya kode? Daftar</button>
+    </div>
+
+    <div class="kartu" style="margin-top:24px;background:#f7f9f8;border-style:dashed">
+      <div style="display:flex;gap:10px">
+        <span style="font-size:17px">💡</span>
+        <div class="kecil">Kartu petani hilang? Hubungi penyuluh lapangan.
+          Kode lama akan dicabut dan diganti yang baru.</div>
+      </div>
+    </div>
+  </div>`,
+};
+
+/* ── 6. Buat PIN ── */
+LAYAR.pin = {
+  catatan: `<h2>PIN 6 angka</h2>
+    <p>Hanya diminta saat membuka aplikasi di HP yang sudah terikat — bukan saat
+       mendaftar. Jadi tidak menambah gesekan pada langkah yang paling rawan
+       ditinggalkan.</p>
+    <p class="note">Inilah yang melindungi kalau HP dipinjam atau hilang. PIN
+       yang mudah ditebak (123456, angka kembar) ditolak server.</p>`,
+  html: () => `
+  <div class="pad" style="padding-top:34px;text-align:center;display:flex;flex-direction:column;height:100%">
+    <div style="font-size:40px;margin-bottom:14px">🔐</div>
+    <h1 class="judul">Buat PIN</h1>
+    <p class="kecil" style="margin:0 20px">Enam angka untuk membuka aplikasi.
+      Jangan pakai tanggal lahir.</p>
+    <div class="pin-titik">${[0,1,2,3,4,5].map(i=>`<i class="${i<S.pin.length?'isi':''}"></i>`).join('')}</div>
+    <div class="tuts" style="margin-top:auto;padding-bottom:20px">
+      ${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-aksi="pinTekan" data-n="${n}">${n}</button>`).join('')}
+      <button class="kosong"></button>
+      <button data-aksi="pinTekan" data-n="0">0</button>
+      <button data-aksi="pinHapus" style="font-size:17px">⌫</button>
+    </div>
+  </div>`,
+};
+
+/* ── 7. Beranda ── */
+LAYAR.beranda = {
+  nav: true, terang: false,
+  catatan: `<h2>Beranda</h2>
+    <p>Tiga hal yang ingin diketahui petani setiap pagi, berurutan:
+       bagaimana cuacanya, bagaimana kebunnya, dan apa yang harus dikerjakan.</p>
+    <h3>Cuaca yang berguna</h3>
+    <p>Angka "82% peluang hujan" tidak memberi tahu apa pun. Yang berguna adalah
+       <b>"tunda penyemprotan hari ini"</b> — server menerjemahkan prakiraan
+       menjadi tindakan kebun.</p>
+    <h3>Sumber data</h3>
+    <p>BMKG, prakiraan per desa. Atribusi wajib ditampilkan — itu syarat
+       pemakaiannya, dan sudah ada di bawah kartu cuaca.</p>
+    <p class="note">Kebun berstatus "belum diperiksa" diberi warna abu-abu
+       tersendiri, tidak dihijaukan. Kebun tanpa data bukan kebun sehat.</p>`,
+  html: () => {
+    const k1 = S.kebun[0];
+    return `
+  <div class="hero">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-top:6px">
+      <div>
+        <div style="color:#8fb3a2;font-size:12.5px;font-weight:600">Selamat pagi</div>
+        <h1>${esc(S.petani.nama)}</h1>
+        <div class="kecil mono" style="margin-top:4px">${esc(S.petani.kode)} · ${esc(S.petani.kampung)}</div>
+      </div>
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.16);
+                  display:grid;place-items:center;font-size:17px">🧑‍🌾</div>
+    </div>
+
+    <div class="cuaca">
+      ${S.cuaca.map((c,i)=>`
+      <div class="chari ${i===0?'kini':''}">
+        <div class="hh">${esc(c.hari)}</div>
+        <div class="ik">${c.ik}</div>
+        <div class="sh">${c.maks}°<span style="opacity:.55;font-weight:600">/${c.min}°</span></div>
+        <div class="hj">💧 ${c.hujan}%</div>
+      </div>`).join('')}
+    </div>
+    <div style="text-align:center;color:#7ba58c;font-size:10px;margin-top:9px">
+      Sumber data: BMKG · Kampung Suaran</div>
+  </div>
+
+  <div class="pad" style="margin-top:-12px">
+    <div class="saran">
+      <span style="font-size:16px">🌧️</span>
+      <div><b>Jangan menyemprot hari ini.</b> Hujan kemungkinan besar turun —
+        fungisida akan tercuci sebelum bekerja. Besok lebih cerah.</div>
+    </div>
+
+    <h2 class="sub">Kebun Anda</h2>
+    ${S.kebun.map(k=>`
+    <button class="kebun" data-aksi="bukaKebun" data-id="${k.id}">
+      <span class="cincin" style="background:${WARNA[k.status]}">${k.ha.toString().replace('.',',')}</span>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-weight:700;font-size:14.5px">${esc(k.nama)}</span>
+        <span class="badge-status" style="color:${WARNA[k.status]};margin-top:3px">
+          <i class="titik" style="background:${WARNA[k.status]}"></i>${LABEL[k.status]}</span>
+        <span style="display:block" class="mini">${k.masalah? esc(k.masalah)+' · ':''}diperiksa ${k.umur} hari lalu</span>
+      </span>
+      <span style="color:var(--teks3);font-size:19px">›</span>
+    </button>`).join('')}
+
+    ${k1.status !== 'sehat' ? `
+    <div class="kartu" style="border-color:#f2ccc4;background:#fdf3f1">
+      <div style="display:flex;gap:11px">
+        <span style="font-size:19px">⚠️</span>
+        <div>
+          <div style="font-weight:700;font-size:13.5px;color:var(--kritis)">Perlu tindakan di Kebun 1</div>
+          <div class="kecil" style="margin-top:4px">Terindikasi busuk buah pada 3 dari 14 foto terakhir.
+            Pangkas dan musnahkan buah yang terinfeksi, jangan dibiarkan di kebun.</div>
+          <button class="tbl mrh" style="margin-top:11px;padding:11px;font-size:13.5px"
+                  data-aksi="bukaKebun" data-id="1">Lihat Rinciannya</button>
+        </div>
+      </div>
+    </div>` : ''}
+
+    <h2 class="sub">Minggu ini</h2>
+    <div style="display:flex;gap:9px">
+      ${[['23','Foto terkirim'],['3','Menunggu kirim'],['2','Sedang dianalisis']].map(([n,l])=>`
+      <div class="kartu" style="flex:1;text-align:center;padding:14px 6px;margin:0">
+        <div style="font-size:23px;font-weight:800;letter-spacing:-.02em">${n}</div>
+        <div class="mini" style="margin-top:3px;line-height:1.3">${l}</div>
+      </div>`).join('')}
+    </div>
+
+    <button class="tbl" style="margin:18px 0 22px;padding:18px" data-tab="kamera">
+      📷 Ambil Foto Kebun</button>
+  </div>`;
+  },
+};
+
+/* ── 8. Kamera ── */
+LAYAR.kamera = {
+  nav: true, terang: true,
+  catatan: `<h2>Kamera dengan GPS</h2>
+    <p>Tombol rana <b>terkunci</b> sampai GPS terkunci. Foto tanpa koordinat
+       tidak bisa dihubungkan ke poligon kebun mana pun, jadi tidak ada gunanya
+       diambil.</p>
+    <h3>Di luar poligon</h3>
+    <p>Kalau titik GPS jatuh di luar batas kebun yang dipilih, aplikasi memberi
+       peringatan <b>lembut</b> dan tetap mengizinkan. Tegakan kakao rimbun dan
+       GPS bisa meleset 20–30 m — menolak foto akan salah lebih sering daripada
+       benar.</p>
+    <p class="note">Server tetap menandainya di kolom <span class="mono">dalam_poligon</span>
+       untuk ditinjau belakangan.</p>`,
+  html: () => {
+    const gpsTeks = {
+      cari: ['Mencari sinyal GPS…', 'Tunggu sebentar, tombol foto terbuka setelah lokasi terkunci', 'cari'],
+      ok: ['Lokasi terkunci · ±6 m', 'Anda berada di dalam Kebun 1 — Suaran', 'ok'],
+      luar: ['Anda tampak di luar batas kebun', 'Titik Anda 34 m dari batas Kebun 1. Foto tetap bisa diambil.', 'luar'],
+    }[S.gps];
+    return `
+  <div class="kamera">
+    <div class="viewfinder">
+      ${[...Array(11)].map((_,i)=>{
+        const w=44+Math.random()*70, r=Math.random()*360;
+        return `<div class="daun" style="width:${w}px;height:${w*.42}px;
+          left:${Math.random()*88}%;top:${Math.random()*88}%;transform:rotate(${r}deg);
+          background:hsl(${95+Math.random()*38} 33% ${20+Math.random()*24}%)"></div>`;
+      }).join('')}
+      <div class="pod" style="width:62px;height:96px;left:31%;top:34%;transform:rotate(-14deg);
+        background:linear-gradient(148deg,#c9761f,#8e4512)"></div>
+      <div class="pod" style="width:48px;height:76px;left:57%;top:47%;transform:rotate(11deg);
+        background:linear-gradient(148deg,#7f9130,#4d5c17)"></div>
+
+      <div class="gps ${gpsTeks[2]}">
+        <span style="font-size:15px">${S.gps==='cari'?'🛰️':S.gps==='ok'?'📍':'⚠️'}</span>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:12px">${gpsTeks[0]}</div>
+          <div style="color:#b9ccc2;font-size:10.5px;margin-top:2px">${gpsTeks[1]}</div>
+        </div>
+        ${S.gps!=='cari'?`<span class="mono" style="font-size:9.5px;color:#8fb3a2">2.0083<br>117.6268</span>`:''}
+      </div>
+
+      <div style="position:absolute;bottom:16px;left:16px;right:16px;text-align:center">
+        <span style="background:rgba(8,18,14,.72);color:#fff;padding:7px 13px;border-radius:18px;
+                     font-size:11.5px;font-weight:600">
+          ${S.organ==='buah'?'Dekatkan ke buah, isi ⅔ layar':
+            S.organ==='daun'?'Ambil daun dewasa, latar rata':'Ambil batang setinggi dada'}</span>
+      </div>
+    </div>
+
+    <div class="organ-pilih">
+      ${['buah','batang','daun'].map(o=>`
+      <button class="${S.organ===o?'on':''}" data-aksi="pilihOrgan" data-o="${o}">
+        ${ORGAN_IK[o]} ${o[0].toUpperCase()+o.slice(1)}</button>`).join('')}
+    </div>
+
+    <div class="rana">
+      <div style="width:74px">
+        <div style="font:700 10px/1 'Plus Jakarta Sans';color:#7d938a;letter-spacing:.1em">KEBUN</div>
+        <button style="background:none;border:0;color:#fff;font:700 13px/1.3 'Plus Jakarta Sans';
+                       padding:5px 0;cursor:pointer" data-aksi="gantiKebun">Kebun 1 ▾</button>
+      </div>
+      <button class="tombol-rana" data-aksi="jepret" ${S.gps==='cari'?'disabled':''}></button>
+      <div style="width:74px;text-align:right">
+        <div style="font:700 10px/1 'Plus Jakarta Sans';color:#7d938a;letter-spacing:.1em">ANTREAN</div>
+        <button style="background:none;border:0;color:#fff;font:700 13px/1.3 'Plus Jakarta Sans';
+                       padding:5px 0;cursor:pointer" data-tab="antrean">3 foto</button>
+      </div>
+    </div>
+  </div>`;
+  },
+  sesudah: () => {
+    if (S.gps === 'cari') {
+      clearTimeout(window._gpsT);
+      window._gpsT = setTimeout(() => { S.gps = 'ok'; if (S.layar==='kamera') gambar(); }, 1600);
+    }
+  },
+};
+
+/* ── 9. Hasil analisis ── */
+LAYAR.hasil = {
+  nav: true,
+  catatan: `<h2>Hasil analisis</h2>
+    <p>Kotak deteksi digambar di atas foto asli, jadi petani bisa melihat
+       <b>buah mana</b> yang dimaksud — bukan sekadar membaca nama penyakit.</p>
+    <h3>Kejujuran soal kepercayaan</h3>
+    <p>Model buah mencapai mAP50 0,869 pada foto dekat tetapi hanya 0,357 pada
+       foto lapangan apa adanya. Deteksi di bawah 50% ditandai
+       <b>"perlu diperiksa"</b>, bukan disajikan sebagai kesimpulan.</p>
+    <p class="note">Menampilkan tebakan lemah sebagai kepastian akan merusak
+       kepercayaan petani lebih cepat daripada tidak menampilkan apa pun.</p>`,
+  html: () => `
+  <div class="pad" style="padding-top:16px;padding-bottom:24px">
+    <button class="tbl putih" style="width:auto;padding:9px 14px;font-size:13px;margin-bottom:14px"
+            data-tab="riwayat">←</button>
+
+    <div class="foto-hasil">
+      ${[...Array(8)].map(()=>{const w=40+Math.random()*66;return`
+        <div class="daun" style="width:${w}px;height:${w*.4}px;left:${Math.random()*84}%;
+          top:${Math.random()*84}%;transform:rotate(${Math.random()*360}deg);
+          background:hsl(${95+Math.random()*32} 30% ${22+Math.random()*22}%)"></div>`;}).join('')}
+      <div class="pod" style="width:70px;height:106px;left:26%;top:26%;transform:rotate(-11deg);
+        background:linear-gradient(148deg,#8d6b28,#4e3a10)"></div>
+      <div class="pod" style="width:54px;height:84px;left:58%;top:44%;transform:rotate(13deg);
+        background:linear-gradient(148deg,#84962f,#4d5c17)"></div>
+      <div class="kotak" style="left:23%;top:23%;width:26%;height:36%;border-color:#c0392b">
+        <b style="background:#c0392b">Busuk buah 81%</b></div>
+      <div class="kotak" style="left:55%;top:41%;width:21%;height:29%;border-color:#e0a12a">
+        <b style="background:#e0a12a">Perlu diperiksa 44%</b></div>
+    </div>
+
+    <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+      <span class="chip">🥥 Buah</span>
+      <span class="chip abu mono">Kebun 1</span>
+      <span class="chip abu">Kemarin 16.40</span>
+      <span class="chip abu mono">v12</span>
+    </div>
+
+    <div class="kartu" style="margin-top:14px;border-left:4px solid var(--kritis)">
+      <div class="eyebrow" style="color:var(--kritis)">Perlu tindakan</div>
+      <h2 style="font-size:19px;font-weight:800;margin:7px 0 6px;letter-spacing:-.02em">Busuk buah</h2>
+      <p class="kecil" style="margin:0">Disebabkan jamur <i>Phytophthora palmivora</i>.
+        Menular cepat lewat percikan air hujan, terutama pada musim basah seperti minggu ini.</p>
+    </div>
+
+    <h2 class="sub">Yang sebaiknya dilakukan</h2>
+    <div class="kartu" style="padding:6px 16px">
+      ${[['1','Pangkas buah yang terinfeksi','Jangan dibiarkan jatuh di kebun — sporanya menyebar dari sana.'],
+         ['2','Musnahkan jauh dari kebun','Kubur atau bakar. Jangan ditumpuk di pinggir lahan.'],
+         ['3','Kurangi kelembapan','Pangkas cabang yang terlalu rapat agar sinar matahari masuk.'],
+         ['4','Semprot setelah hujan reda','Fungisida berbahan tembaga. Tunggu cuaca cerah — besok lebih baik.']]
+        .map(([n,j,d],i,a)=>`
+      <div style="display:flex;gap:12px;padding:13px 0;${i<a.length-1?'border-bottom:1px solid var(--garis)':''}">
+        <span style="width:24px;height:24px;border-radius:50%;background:var(--hijau-muda);color:var(--hijau);
+          display:grid;place-items:center;font:700 12px/1 'Plus Jakarta Sans';flex:0 0 auto">${n}</span>
+        <div><div style="font-weight:700;font-size:13.5px">${j}</div>
+          <div class="kecil" style="margin-top:2px">${d}</div></div>
+      </div>`).join('')}
+    </div>
+
+    <div class="kartu" style="margin-top:11px;background:#f7f9f8;border-style:dashed">
+      <div style="display:flex;gap:10px">
+        <span style="font-size:16px">ℹ️</span>
+        <div class="kecil">Satu deteksi bernilai <b>44%</b> ditandai perlu diperiksa —
+          model belum yakin. Periksa langsung buah tersebut sebelum mengambil tindakan.</div>
+      </div>
+    </div>
+
+    <div class="tumpuk" style="margin-top:18px">
+      <button class="tbl halus" data-aksi="lapor">Laporkan Hasil Ini Keliru</button>
+      <button class="tbl putih" data-tab="kamera">Ambil Foto Lagi</button>
+    </div>
+  </div>`,
+};
+
+/* ── 10. Antrean ── */
+LAYAR.antrean = {
+  nav: true,
+  catatan: `<h2>Antrean kirim</h2>
+    <p>Foto <b>selalu</b> masuk antrean lokal dulu, tidak pernah langsung
+       dikirim. Petani berjalan di kebun tanpa sinyal; aplikasi yang menunggu
+       jaringan akan terasa rusak.</p>
+    <h3>Hemat kuota</h3>
+    <p>Foto dikecilkan ke sisi panjang 1280 px sebelum dikirim (±350 KB).
+       Model bekerja di 640 px, jadi tidak ada informasi yang hilang — sementara
+       foto 12 MP mentah akan menghabiskan kuota tanpa menambah akurasi.</p>
+    <p class="note">Sebelum mengunggah, aplikasi bertanya <span class="mono">/cek-hash</span>
+       lebih dulu. Beberapa ratus byte jauh lebih murah daripada mengirim ulang
+       350 KB yang ternyata sudah sampai.</p>`,
+  html: () => `
+  <div class="pad" style="padding-top:20px;padding-bottom:24px">
+    <h1 class="judul">Antrean kirim</h1>
+    <p class="kecil">Foto tersimpan aman di HP dan terkirim sendiri saat ada sinyal.</p>
+
+    <div class="kartu" style="margin-top:16px;background:var(--hijau-muda);border-color:#cfe3d8">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:700;font-size:14px;color:var(--hijau-tua)">Sinyal lemah (2G)</div>
+          <div class="kecil" style="margin-top:2px">Pengiriman berjalan pelan tapi tetap jalan.</div>
+        </div>
+        <span style="font-size:22px">📶</span>
+      </div>
+      <div class="progres" style="margin-top:12px"><i style="width:${S.kirimProgres||22}%"></i></div>
+      <div class="mini" style="margin-top:6px">1 dari 3 foto sedang dikirim · ${S.kirimProgres||22}%</div>
+    </div>
+
+    <h2 class="sub">Menunggu dikirim (3)</h2>
+    ${S.antrean.map(a=>`
+    <div class="baris">
+      <span class="kotak-kecil">${ORGAN_IK[a.organ]}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:14px">${a.organ[0].toUpperCase()+a.organ.slice(1)} · ${a.kebun}</div>
+        <div class="mini">Diambil ${a.jam} · 348 KB</div>
+      </div>
+      <span class="chip ${a.status==='kirim'?'':'abu'}">${a.status==='kirim'?'Mengirim…':'Antre'}</span>
+    </div>`).join('')}
+
+    <h2 class="sub">Sudah terkirim hari ini (4)</h2>
+    ${[['buah','07.02'],['buah','07.01'],['daun','06.58'],['batang','06.55']].map(([o,j])=>`
+    <div class="baris">
+      <span class="kotak-kecil" style="opacity:.6">${ORGAN_IK[o]}</span>
+      <div style="flex:1"><div style="font-weight:600;font-size:14px">${o[0].toUpperCase()+o.slice(1)} · Kebun 1</div>
+        <div class="mini">Diambil ${j}</div></div>
+      <span style="color:var(--sehat);font-size:17px">✓</span>
+    </div>`).join('')}
+
+    <div class="tumpuk" style="margin-top:20px">
+      <button class="tbl" data-aksi="kirimSekarang">Kirim Sekarang</button>
+      <button class="tbl putih" data-aksi="hanyaWifi">Kirim Hanya Lewat Wi-Fi</button>
+    </div>
+  </div>`,
+};
+
+/* ── 11. Riwayat ── */
+LAYAR.riwayat = {
+  nav: true,
+  catatan: `<h2>Riwayat</h2>
+    <p>Warna di sini memakai tangga yang sama dengan dashboard penyuluh, jadi
+       petani dan penyuluh membicarakan hal yang sama saat bertemu di kebun.</p>
+    <p class="note">Riwayat tersimpan offline. Petani bisa membukanya di tengah
+       kebun tanpa sinyal untuk membandingkan dengan kondisi hari ini.</p>`,
+  html: () => `
+  <div class="pad" style="padding-top:20px;padding-bottom:24px">
+    <h1 class="judul">Riwayat</h1>
+    <p class="kecil">Semua foto dan hasilnya, tersimpan di HP.</p>
+    <div style="display:flex;gap:7px;margin:16px 0 8px;flex-wrap:wrap">
+      <span class="chip">Semua</span><span class="chip abu">🥥 Buah</span>
+      <span class="chip abu">🍃 Daun</span><span class="chip abu">🪵 Batang</span>
+    </div>
+    ${S.riwayat.map(r=>`
+    <button class="kebun" data-goto="hasil" style="margin-top:9px">
+      <span class="kotak-kecil">${ORGAN_IK[r.organ]}</span>
+      <span style="flex:1;min-width:0">
+        <span style="display:block;font-weight:700;font-size:14px">${esc(r.kelas)}</span>
+        <span class="mini">${esc(r.kebun)} · ${esc(r.tgl)}</span>
+      </span>
+      <span class="titik" style="background:${WARNA[r.warna]};width:11px;height:11px"></span>
+    </button>`).join('')}
+    <div style="text-align:center;padding:22px 0" class="mini">Menampilkan 4 dari 23 foto</div>
+  </div>`,
+};
+
+/* ── 12. Detail kebun ── */
+LAYAR.kebun = {
+  nav: true,
+  catatan: `<h2>Detail kebun</h2>
+    <p>Poligon yang sama persis dengan yang ada di dashboard Peta Kebun Kakao
+       Berau — diambil dari <span class="mono">/v1/saya</span> dan disimpan
+       offline oleh aplikasi.</p>
+    <h3>Luas tercatat vs terukur</h3>
+    <p>Kuning selalu berarti angka yang dicatat surveyor, sian berarti angka
+       yang dihitung dari geometri. Aturan warna yang sama dipakai di dashboard.</p>
+    <p class="note">Untuk Kebun 1 selisihnya besar (1,0 ha vs 0,40 ha) — kebun
+       ini termasuk 33 poligon yang perlu diverifikasi ulang di lapangan.</p>`,
+  html: () => {
+    const k = S.kebun.find(x => x.id === S.kebunAktif) || S.kebun[0];
+    return `
+  <div class="pad" style="padding-top:16px;padding-bottom:24px">
+    <button class="tbl putih" style="width:auto;padding:9px 14px;font-size:13px;margin-bottom:14px"
+            data-tab="beranda">←</button>
+    <h1 class="judul">${esc(k.nama)}</h1>
+    <div style="display:flex;gap:7px;margin-top:9px;flex-wrap:wrap">
+      <span class="chip mono">${esc(k.kode)}</span>
+      <span class="chip abu">Suaran · BMO</span>
+    </div>
+
+    <div class="peta" style="margin-top:16px">
+      <svg viewBox="0 0 340 168" preserveAspectRatio="xMidYMid slice">
+        <rect width="340" height="168" fill="#dbe6dd"/>
+        ${[...Array(26)].map(()=>{
+          const x=Math.random()*340,y=Math.random()*168,r=6+Math.random()*13;
+          return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(0)}"
+                   fill="#b9cfbe" opacity=".55"/>`;}).join('')}
+        <path d="M30 140 Q110 118 175 128 T318 108" stroke="#c9b99a" stroke-width="7" fill="none"/>
+        <polygon points="96,44 236,52 228,124 88,116" fill="${WARNA[k.status]}" fill-opacity=".3"
+                 stroke="${WARNA[k.status]}" stroke-width="2.6"/>
+        <circle cx="162" cy="84" r="7" fill="${WARNA[k.status]}" stroke="#fff" stroke-width="2.6"/>
+        <text x="162" y="106" text-anchor="middle" font-family="Plus Jakarta Sans"
+              font-size="10.5" font-weight="700" fill="#14201c">Anda di sini</text>
+      </svg>
+    </div>
+
+    <div class="kartu" style="margin-top:12px;border-left:4px solid ${WARNA[k.status]}">
+      <div class="badge-status" style="color:${WARNA[k.status]}">
+        <i class="titik" style="background:${WARNA[k.status]}"></i>${LABEL[k.status]}</div>
+      <div class="kecil" style="margin-top:6px">
+        ${k.masalah ? `Masalah utama: <b>${esc(k.masalah)}</b>. ` : ''}Terakhir diperiksa ${k.umur} hari lalu
+        dari ${k.foto} foto.</div>
+    </div>
+
+    <h2 class="sub">Luas kebun</h2>
+    <div class="kartu">
+      ${[['Dicatat surveyor', k.ha, '#e0a12a'], ['Terukur dari peta', k.id===1?0.40:0.71, '#2b9aa8']]
+        .map(([l,v,c])=>`
+      <div style="display:flex;align-items:center;gap:10px;margin:7px 0">
+        <span class="kecil" style="width:98px;flex:0 0 auto">${l}</span>
+        <span style="flex:1;height:9px;background:#eef2ef;border-radius:5px;overflow:hidden">
+          <i style="display:block;height:100%;width:${v/k.ha*100}%;background:${c};border-radius:5px"></i></span>
+        <span class="mono" style="font-weight:600;font-size:12.5px;color:${c};width:52px;text-align:right">
+          ${v.toFixed(2).replace('.',',')} ha</span>
+      </div>`).join('')}
+      ${k.id===1?`<div class="mini" style="margin-top:9px;line-height:1.5">
+        Selisihnya besar. Petugas akan mengukur ulang batas kebun ini di lapangan.</div>`:''}
+    </div>
+
+    <h2 class="sub">Riwayat 30 hari</h2>
+    <div class="kartu" style="padding:16px">
+      <div style="display:flex;gap:3px;align-items:flex-end;height:62px">
+        ${[3,4,2,5,6,4,7,5,8,6,9,7,11,8].map((v,i)=>`
+        <span style="flex:1;height:${v*8}%;border-radius:3px 3px 0 0;
+          background:${i>9?WARNA.perlu_perawatan:i>5?WARNA.pantau:WARNA.sehat}"></span>`).join('')}
+      </div>
+      <div class="mini" style="margin-top:8px">Jumlah buah terindikasi sakit per pemeriksaan —
+        naik dalam dua minggu terakhir.</div>
+    </div>
+
+    <button class="tbl" style="margin-top:18px" data-tab="kamera">📷 Foto Kebun Ini</button>
+  </div>`;
+  },
+};
+
+/* ── 13. Akun ── */
+LAYAR.akun = {
+  nav: true,
+  catatan: `<h2>Akun</h2>
+    <p>Kode petani ditampilkan agar mudah dibacakan ke penyuluh lewat telepon,
+       tetapi PIN dan token tidak pernah ditampilkan di mana pun.</p>
+    <p class="note">"Kirim hanya lewat Wi-Fi" adalah pilihan petani, bukan
+       keputusan aplikasi. Kuota di lokasi mahal dan hanya petani yang tahu
+       kapan dia dekat Wi-Fi.</p>`,
+  html: () => `
+  <div class="pad" style="padding-top:20px;padding-bottom:24px">
+    <div style="text-align:center;padding:14px 0 20px">
+      <div style="width:74px;height:74px;border-radius:50%;background:var(--hijau-muda);
+                  display:grid;place-items:center;font-size:31px;margin:0 auto 12px">🧑‍🌾</div>
+      <h1 class="judul" style="font-size:21px">${esc(S.petani.nama)}</h1>
+      <div class="mono kecil" style="margin-top:3px">${esc(S.petani.kode)}</div>
+    </div>
+
+    <div class="kartu" style="padding:4px 16px">
+      ${[['Kampung','Suaran'],['Site','BMO'],['Jumlah kebun','2 kebun · 1,75 ha'],
+         ['Terdaftar sejak','9 Agustus 2026'],['Versi aplikasi','1.0.0']].map(([k,v],i,a)=>`
+      <div style="display:flex;justify-content:space-between;padding:13px 0;
+                  ${i<a.length-1?'border-bottom:1px solid var(--garis)':''}">
+        <span class="kecil">${k}</span><span style="font-size:13.5px;font-weight:600">${v}</span>
+      </div>`).join('')}
+    </div>
+
+    <h2 class="sub">Pengaturan</h2>
+    <div class="kartu" style="padding:4px 16px">
+      ${[['Kirim hanya lewat Wi-Fi','Hemat kuota',false],
+         ['Ingatkan foto mingguan','Setiap Senin pagi',true],
+         ['Peringatan cuaca','Sebelum hujan lebat',true]].map(([j,d,on],i,a)=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;
+                  ${i<a.length-1?'border-bottom:1px solid var(--garis)':''}">
+        <div><div style="font-size:13.5px;font-weight:600">${j}</div>
+          <div class="mini">${d}</div></div>
+        <span style="width:44px;height:26px;border-radius:14px;flex:0 0 auto;position:relative;
+              background:${on?'var(--hijau)':'#d5ddd8'}">
+          <i style="position:absolute;top:3px;${on?'right:3px':'left:3px'};width:20px;height:20px;
+             border-radius:50%;background:#fff;display:block"></i></span>
+      </div>`).join('')}
+    </div>
+
+    <div class="tumpuk" style="margin-top:20px">
+      <button class="tbl putih" data-aksi="bantuan">Hubungi Penyuluh</button>
+      <button class="tbl putih" style="color:var(--kritis);border-color:#f0cdc7" data-goto="mulai">Keluar</button>
+    </div>
+    <p class="mini" style="text-align:center;margin-top:20px;line-height:1.6">
+      AI Kakao · PT Berau Coal × ITSB<br>Sumber cuaca: BMKG</p>
+  </div>`,
+};
+
+/* ═══ AKSI ════════════════════════════════════════════════════════════════ */
+const AKSI = {
+  jepretKtp: () => ke('ktp-hasil'),
+  ulangKtp:  () => { S.ktpTerbaca = 0; ke('ktp'); },
+  kirimKtp:  () => ke('tunggu'),
+  cekStatus: () => { toast('Disetujui! Silakan masuk dengan kode petani Anda.');
+                     setTimeout(()=>ke('masuk'), 1400); },
+  masuk: () => {
+    const nama = $('in-nama')?.value.trim(), kode = $('in-kode')?.value.trim().toUpperCase();
+    if (!nama || !kode) return toast('Isi nama dan kode petani.');
+    if (!/^PTN-\d{5}-\d$/.test(kode)) return toast('Format kode belum benar. Contoh: PTN-00031-9');
+    S.pin = ''; ke('pin');
+  },
+  pinTekan: (b) => {
+    if (S.pin.length >= 6) return;
+    S.pin += b.dataset.n; gambar();
+    if (S.pin.length === 6) setTimeout(() => {
+      if (/^(\d)\1{5}$/.test(S.pin) || S.pin === '123456') {
+        S.pin = ''; gambar(); return toast('PIN terlalu mudah ditebak. Pilih angka lain.');
+      }
+      toast('PIN tersimpan. Selamat datang!'); setTimeout(() => ke('beranda'), 900);
+    }, 260);
+  },
+  pinHapus: () => { S.pin = S.pin.slice(0, -1); gambar(); },
+  pilihOrgan: (b) => { S.organ = b.dataset.o; gambar(); },
+  gantiKebun: () => toast('Petani dengan satu kebun tidak pernah ditanya — pemilih ini hanya muncul bila punya lebih dari satu.'),
+  jepret: () => {
+    S.antrean.unshift({organ:S.organ, kebun:'Kebun 1', jam:'07.44', status:'antre'});
+    toast(S.gps === 'luar'
+      ? 'Foto tersimpan dan ditandai di luar batas kebun.'
+      : 'Foto tersimpan di antrean. Terkirim sendiri saat ada sinyal.');
+  },
+  bukaKebun: (b) => { S.kebunAktif = +b.dataset.id; ke('kebun'); },
+  kirimSekarang: () => {
+    S.kirimProgres = 22; gambar();
+    const t = setInterval(() => {
+      S.kirimProgres += 13;
+      if (S.kirimProgres >= 100) { clearInterval(t); S.kirimProgres = 0; S.antrean = [];
+        toast('Semua foto terkirim. Hasil analisis akan muncul sebentar lagi.'); }
+      if (S.layar === 'antrean') gambar();
+    }, 420);
+  },
+  hanyaWifi: () => toast('Foto akan menunggu sampai HP tersambung Wi-Fi.'),
+  lapor: () => toast('Terima kasih. Laporan Anda dikirim ke tim peneliti untuk ditinjau.'),
+  bantuan: () => toast('Penyuluh wilayah Suaran: 0812-5555-1234'),
+};
+
+gambar();
+</script>
+</body>
+</html>

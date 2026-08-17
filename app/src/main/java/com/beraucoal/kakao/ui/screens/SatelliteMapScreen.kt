@@ -1,5 +1,7 @@
 package com.beraucoal.kakao.ui.screens
 
+// KML overlay support
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import com.beraucoal.kakao.data.KmlParser
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -40,13 +43,19 @@ import androidx.compose.ui.unit.sp
 import com.beraucoal.kakao.data.*
 import com.beraucoal.kakao.ui.components.PlantationBottomSheet
 import com.beraucoal.kakao.ui.theme.KakaoColors
+import androidx.compose.material.icons.filled.Satellite
 import com.beraucoal.kakao.ui.theme.KakaoElevation
 import com.beraucoal.kakao.ui.theme.PoppinsFontFamily
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.graphics.toArgb
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.util.MapTileIndex
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Polygon as OsmPolygon
+import org.osmdroid.views.overlay.Marker as OsmMarker
 import kotlinx.coroutines.launch
 
 data class MapSearchResult(
@@ -54,25 +63,35 @@ data class MapSearchResult(
     val subtitle: String,
     val icon: ImageVector,
     val targetLatLng: LatLng,
-    val associatedKebun: KebunArea? = null
+    val associatedKebun: KebunArea? = null,
+    val associatedBlok: BlokBagian? = null,
+    val associatedPohon: PohonKakao? = null
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SatelliteMapScreen(
     plantationRepository: PlantationRepository = remember { PlantationRepository() },
-    onNavigateToSelfMapping: () -> Unit = {}
+    onNavigateToSelfMapping: () -> Unit = {},
+    onReportKondisi: (PohonKakao) -> Unit = {}
 ) {
     val kebunList by plantationRepository.kebunList.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
-    var mapType by remember { mutableStateOf(MapType.SATELLITE) }
+    var mapType by remember { mutableStateOf(0) }
     var selectedKebun by remember { mutableStateOf<KebunArea?>(null) }
     var selectedBlok by remember { mutableStateOf<BlokBagian?>(null) }
     var selectedPohon by remember { mutableStateOf<PohonKakao?>(null) }
     var filterStatus by remember { mutableStateOf<PohonStatus?>(null) }
+
+    // ── KML Overlay (Sentinel-2 jadwal akuisisi) ──
+    var showKmlOverlay by remember { mutableStateOf(true) }
+    val kmlData = remember {
+        KmlParser.parseFromAssets(context, "kml/sentinel2_schedule.kml")
+    }
 
     val activeKebun = selectedKebun ?: kebunList.firstOrNull()
 
@@ -109,9 +128,28 @@ fun SatelliteMapScreen(
                                 subtitle = "Populasi: ${blok.totalPohon} pohon (${blok.pohonSehatCount} sehat)",
                                 icon = Icons.Filled.Info,
                                 targetLatLng = kebun.centerLocation,
-                                associatedKebun = kebun
+                                associatedKebun = kebun,
+                                associatedBlok = blok
                             )
                         )
+                    }
+
+                    // 1b. Pencarian berdasarkan Kode Pohon / ID Pohon
+                    for (pohon in blok.pohonList) {
+                        if (pohon.kodePohon.lowercase().contains(query) ||
+                            pohon.id.lowercase().contains(query)) {
+                            results.add(
+                                MapSearchResult(
+                                    title = pohon.kodePohon,
+                                    subtitle = "${pohon.status.label} • ${blok.namaBlok} (${kebun.namaKebun})",
+                                    icon = Icons.Filled.LocationOn,
+                                    targetLatLng = LatLng(pohon.location.latitude, pohon.location.longitude),
+                                    associatedKebun = kebun,
+                                    associatedBlok = blok,
+                                    associatedPohon = pohon
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -162,8 +200,17 @@ fun SatelliteMapScreen(
     }
 
     val defaultLocation = LatLng(2.15340, 117.48120)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(activeKebun?.centerLocation ?: defaultLocation, 16.5f)
+    var mapCenterTrigger by remember { mutableStateOf<Pair<GeoPoint, Double>?>(null) }
+    
+    LaunchedEffect(Unit) {
+        Configuration.getInstance().userAgentValue = context.packageName
+        mapCenterTrigger = Pair(
+            GeoPoint(
+                activeKebun?.centerLocation?.latitude ?: defaultLocation.latitude,
+                activeKebun?.centerLocation?.longitude ?: defaultLocation.longitude
+            ),
+            16.5
+        )
     }
 
     // Fluid BottomSheetScaffold State dengan Proteksi Batas Bawah (skipHiddenState = true)
@@ -188,6 +235,7 @@ fun SatelliteMapScreen(
                     kebun = activeKebun,
                     selectedBlok = selectedBlok,
                     selectedPohon = selectedPohon,
+                    onReportKondisi = onReportKondisi,
                     onBlokSelected = { blok ->
                         selectedBlok = blok
                         selectedPohon = null
@@ -200,11 +248,11 @@ fun SatelliteMapScreen(
                                 } else {
                                     activeKebun.centerLocation
                                 }
-                                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(center, 18.5f), 800)
+                                mapCenterTrigger = Pair(GeoPoint(center.latitude, center.longitude), 18.5.toDouble())
                             }
                         } else {
                             coroutineScope.launch {
-                                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(activeKebun.centerLocation, 16.5f), 800)
+                                mapCenterTrigger = Pair(GeoPoint(activeKebun.centerLocation.latitude, activeKebun.centerLocation.longitude), 16.5.toDouble())
                             }
                         }
                     },
@@ -212,7 +260,7 @@ fun SatelliteMapScreen(
                         selectedPohon = pohon
                         if (pohon != null) {
                             coroutineScope.launch {
-                                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(pohon.location, 20.0f), 800)
+                                mapCenterTrigger = Pair(GeoPoint(pohon.location.latitude, pohon.location.longitude), 20.0.toDouble())
                             }
                         } else if (selectedBlok != null) {
                             coroutineScope.launch {
@@ -223,7 +271,7 @@ fun SatelliteMapScreen(
                                 } else {
                                     activeKebun.centerLocation
                                 }
-                                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(center, 18.5f), 800)
+                                mapCenterTrigger = Pair(GeoPoint(center.latitude, center.longitude), 18.5.toDouble())
                             }
                         }
                     },
@@ -244,117 +292,135 @@ fun SatelliteMapScreen(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Google Map View
-            GoogleMap(
+            // OSMDroid Map View
+            AndroidView(
                 modifier = Modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                properties = MapProperties(
-                    mapType = mapType,
-                    isMyLocationEnabled = false
-                ),
-                uiSettings = MapUiSettings(
-                    zoomControlsEnabled = false,
-                    compassEnabled = true,
-                    mapToolbarEnabled = false
-                ),
-                onMapClick = {
-                    selectedPohon = null
-                    focusManager.clearFocus()
-                    keyboardController?.hide()
-                }
-            ) {
-                kebunList.forEach { kebun ->
-                    val isSelectedKebun = activeKebun?.id == kebun.id
-                    val isPending = (kebun.verificationStatus == KebunVerificationStatus.PENDING_REVIEW)
-                    val strokeColor = when {
-                        isSelectedKebun -> KakaoColors.PrimaryDark
-                        isPending -> Color(0xFFF57F17)
-                        else -> Color(0xFFF1C40F)
-                    }
-                    val fillColor = when {
-                        isSelectedKebun -> KakaoColors.PrimaryDark.copy(alpha = 0.25f)
-                        isPending -> Color(0x33F57F17)
-                        else -> Color(0x33F1C40F)
-                    }
-
-                    Polygon(
-                        points = kebun.polygon,
-                        fillColor = fillColor,
-                        strokeColor = strokeColor,
-                        strokeWidth = if (isSelectedKebun) 6f else 4f,
-                        clickable = true,
-                        onClick = {
-                            selectedKebun = kebun
-                            selectedBlok = null
-                            selectedPohon = null
-                            coroutineScope.launch {
-                                cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(kebun.centerLocation, 16.5f), 800)
-                                if (scaffoldState.bottomSheetState.currentValue == SheetValue.PartiallyExpanded) {
-                                    scaffoldState.bottomSheetState.expand()
-                                }
+                factory = { ctx ->
+                    MapView(ctx).apply {
+                        setMultiTouchControls(true)
+                        
+                        val tileSource = object : OnlineTileSourceBase(
+                            "EsriWorldImagery",
+                            1, 19, 256, ".png",
+                            arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/")
+                        ) {
+                            override fun getTileURLString(pMapTileIndex: Long): String {
+                                return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" + MapTileIndex.getY(pMapTileIndex) + "/" + MapTileIndex.getX(pMapTileIndex)
                             }
                         }
-                    )
-
-                    kebun.blokList.forEach { blok ->
-                        val isSelectedBlok = selectedBlok?.id == blok.id
-                        Polygon(
-                            points = blok.polygon,
-                            fillColor = if (isSelectedBlok) Color(0x442ECC71) else Color(0x222ECC71),
-                            strokeColor = Color(0xFF2ECC71),
-                            strokeWidth = if (isSelectedBlok) 5f else 3f,
-                            clickable = true,
-                            onClick = {
+                        setTileSource(tileSource)
+                        
+                        // Default center
+                        controller.setZoom(16.5)
+                        controller.setCenter(GeoPoint(
+                            activeKebun?.centerLocation?.latitude ?: defaultLocation.latitude,
+                            activeKebun?.centerLocation?.longitude ?: defaultLocation.longitude
+                        ))
+                    }
+                },
+                update = { mapView ->
+                    mapCenterTrigger?.let { (center, zoom) ->
+                        mapView.controller.animateTo(center, zoom, 800L)
+                        mapCenterTrigger = null
+                    }
+                    
+                    mapView.overlays.clear()
+                    
+                    // KML Overlay
+                    if (showKmlOverlay && kmlData.berauPlacemarks.isNotEmpty()) {
+                        kmlData.berauPlacemarks.forEach { placemark ->
+                            val style = kmlData.styles[placemark.styleId]
+                            val strokeArgb = style?.lineColor ?: 0xFF00FF00
+                            val fillArgb = style?.fillColor ?: 0x4000FF00
+                            
+                            val p = OsmPolygon().apply {
+                                points = placemark.polygon.map { GeoPoint(it.latitude, it.longitude) }
+                                fillPaint.color = fillArgb.toInt()
+                                outlinePaint.color = strokeArgb.toInt()
+                                outlinePaint.strokeWidth = style?.lineWidth ?: 2f
+                            }
+                            mapView.overlays.add(p)
+                        }
+                    }
+                    
+                    // Kebun & Blok Polygons
+                    kebunList.forEach { kebun ->
+                        val isSelectedKebun = activeKebun?.id == kebun.id
+                        val isPending = (kebun.verificationStatus == KebunVerificationStatus.PENDING_REVIEW)
+                        val strokeColor = when {
+                            isSelectedKebun -> KakaoColors.PrimaryDark
+                            isPending -> Color(0xFFF57F17)
+                            else -> Color(0xFFF1C40F)
+                        }
+                        val fillColor = when {
+                            isSelectedKebun -> KakaoColors.PrimaryDark.copy(alpha = 0.25f)
+                            isPending -> Color(0x33F57F17)
+                            else -> Color(0x33F1C40F)
+                        }
+                        
+                        val pKebun = OsmPolygon().apply {
+                            points = kebun.polygon.map { GeoPoint(it.latitude, it.longitude) }
+                            fillPaint.color = fillColor.toArgb()
+                            outlinePaint.color = strokeColor.toArgb()
+                            outlinePaint.strokeWidth = if (isSelectedKebun) 6f else 4f
+                            setOnClickListener { _, _, _ ->
                                 selectedKebun = kebun
-                                selectedBlok = blok
+                                selectedBlok = null
                                 selectedPohon = null
-                                coroutineScope.launch {
-                                    val center = if (blok.polygon.isNotEmpty()) {
-                                        val avgLat = blok.polygon.map { it.latitude }.average()
-                                        val avgLng = blok.polygon.map { it.longitude }.average()
-                                        LatLng(avgLat, avgLng)
-                                    } else {
-                                        kebun.centerLocation
-                                    }
-                                    cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(center, 18.5f), 800)
-                                    if (scaffoldState.bottomSheetState.currentValue == SheetValue.PartiallyExpanded) {
-                                        // Tetap di posisi default agar informatif & rapi
-                                    }
+                                mapCenterTrigger = Pair(GeoPoint(kebun.centerLocation.latitude, kebun.centerLocation.longitude), 16.5)
+                                true // handled
+                            }
+                        }
+                        mapView.overlays.add(pKebun)
+                        
+                        kebun.blokList.forEach { blok ->
+                            val isSelectedBlok = selectedBlok?.id == blok.id
+                            val pBlok = OsmPolygon().apply {
+                                points = blok.polygon.map { GeoPoint(it.latitude, it.longitude) }
+                                fillPaint.color = if (isSelectedBlok) Color(0x442ECC71).toArgb() else Color(0x222ECC71).toArgb()
+                                outlinePaint.color = Color(0xFF2ECC71).toArgb()
+                                outlinePaint.strokeWidth = if (isSelectedBlok) 5f else 3f
+                                setOnClickListener { _, _, _ ->
+                                    selectedKebun = kebun
+                                    selectedBlok = blok
+                                    selectedPohon = null
+                                    
+                                    val avgLat = if(blok.polygon.isNotEmpty()) blok.polygon.map{it.latitude}.average() else kebun.centerLocation.latitude
+                                    val avgLng = if(blok.polygon.isNotEmpty()) blok.polygon.map{it.longitude}.average() else kebun.centerLocation.longitude
+                                    mapCenterTrigger = Pair(GeoPoint(avgLat, avgLng), 18.5)
+                                    true
                                 }
                             }
-                        )
-
-                        if (selectedBlok?.id == blok.id) {
-                            val treesToRender = if (filterStatus != null) {
-                                blok.pohonList.filter { it.status == filterStatus }
-                            } else {
-                                blok.pohonList
-                            }
-
-                            treesToRender.forEach { pohon ->
-                                val markerHue = when (pohon.status) {
-                                    PohonStatus.SEHAT -> BitmapDescriptorFactory.HUE_GREEN
-                                    PohonStatus.PERLU_PUPUK -> BitmapDescriptorFactory.HUE_YELLOW
-                                    PohonStatus.TERSERANG_HAMA -> BitmapDescriptorFactory.HUE_RED
+                            mapView.overlays.add(pBlok)
+                            
+                            if (isSelectedBlok) {
+                                val treesToRender = if (filterStatus != null) {
+                                    blok.pohonList.filter { it.status == filterStatus }
+                                } else {
+                                    blok.pohonList
                                 }
-
-                                Marker(
-                                    state = MarkerState(position = pohon.location),
-                                    title = "Pohon ${pohon.kodePohon} (${pohon.status.label})",
-                                    snippet = "Varietas ${pohon.varietasKakao} • Pemupukan: ${pohon.tanggalPemupukanTerakhir}",
-                                    icon = BitmapDescriptorFactory.defaultMarker(markerHue),
-                                    onClick = {
-                                        selectedKebun = kebun
-                                        selectedBlok = blok
-                                        selectedPohon = pohon
-                                        true
+                                
+                                treesToRender.forEach { pohon ->
+                                    val m = OsmMarker(mapView).apply {
+                                        position = GeoPoint(pohon.location.latitude, pohon.location.longitude)
+                                        title = "Pohon ${pohon.kodePohon} (${pohon.status.label})"
+                                        snippet = "Varietas ${pohon.varietasKakao} • Pemupukan: ${pohon.tanggalPemupukanTerakhir}"
+                                        setOnMarkerClickListener { _, _ ->
+                                            selectedKebun = kebun
+                                            selectedBlok = blok
+                                            selectedPohon = pohon
+                                            mapCenterTrigger = Pair(GeoPoint(pohon.location.latitude, pohon.location.longitude), 20.0)
+                                            true
+                                        }
                                     }
-                                )
+                                    mapView.overlays.add(m)
+                                }
                             }
                         }
                     }
+                    mapView.invalidate()
                 }
-            }
+            )
 
             if (selectedBlok != null) {
                 // Header ala TransJakarta ("Detail Halte / Detail Bus")
@@ -383,7 +449,7 @@ fun SatelliteMapScreen(
                                             } else {
                                                 activeKebun?.centerLocation ?: LatLng(0.0, 0.0)
                                             }
-                                            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(center, 18.5f), 800)
+                                            mapCenterTrigger = Pair(GeoPoint(center.latitude, center.longitude), 18.5.toDouble())
                                         }
                                     }
                                 } else {
@@ -391,7 +457,7 @@ fun SatelliteMapScreen(
                                     selectedPohon = null
                                     activeKebun?.let {
                                         coroutineScope.launch {
-                                            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it.centerLocation, 16.5f), 800)
+                                            mapCenterTrigger = Pair(GeoPoint(it.centerLocation.latitude, it.centerLocation.longitude), 16.5.toDouble())
                                         }
                                     }
                                 }
@@ -528,7 +594,7 @@ fun SatelliteMapScreen(
                                         selectedKebun = first.associatedKebun
                                     }
                                     coroutineScope.launch {
-                                        cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(first.targetLatLng, 16.5f), 1000)
+                                        mapCenterTrigger = Pair(GeoPoint(first.targetLatLng.latitude, first.targetLatLng.longitude), 16.5.toDouble())
                                     }
                                 }
                             }
@@ -564,11 +630,19 @@ fun SatelliteMapScreen(
                                             if (result.associatedKebun != null) {
                                                 selectedKebun = result.associatedKebun
                                             }
+                                            if (result.associatedBlok != null) {
+                                                selectedBlok = result.associatedBlok
+                                            }
+                                            if (result.associatedPohon != null) {
+                                                selectedPohon = result.associatedPohon
+                                            }
                                             coroutineScope.launch {
-                                                cameraPositionState.animate(
-                                                    CameraUpdateFactory.newLatLngZoom(result.targetLatLng, 16.5f),
-                                                    1000
-                                                )
+                                                val zoom = when {
+                                                    result.associatedPohon != null -> 20.0
+                                                    result.associatedBlok != null -> 18.5
+                                                    else -> 16.5
+                                                }
+                                                mapCenterTrigger = Pair(GeoPoint(result.targetLatLng.latitude, result.targetLatLng.longitude), zoom)
                                                 if (result.associatedKebun != null) {
                                                     scaffoldState.bottomSheetState.expand()
                                                 }
@@ -626,11 +700,7 @@ fun SatelliteMapScreen(
                         .size(44.dp)
                         .clip(CircleShape)
                         .clickable {
-                            mapType = when (mapType) {
-                                MapType.SATELLITE -> MapType.HYBRID
-                                MapType.HYBRID -> MapType.NORMAL
-                                else -> MapType.SATELLITE
-                            }
+                            mapType = (mapType + 1) % 3
                         }
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -640,6 +710,28 @@ fun SatelliteMapScreen(
                             tint = KakaoColors.PrimaryDark,
                             modifier = Modifier.size(20.dp)
                         )
+                    }
+                }
+
+                // KML Overlay Toggle Button (Jadwal Satelit S2C)
+                if (kmlData.berauCount > 0) {
+                    Surface(
+                        shape = CircleShape,
+                        color = if (showKmlOverlay) KakaoColors.Primary else KakaoColors.Surface,
+                        shadowElevation = KakaoElevation.Medium,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .clickable { showKmlOverlay = !showKmlOverlay }
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Filled.Satellite,
+                                contentDescription = "Jadwal Satelit Sentinel-2",
+                                tint = if (showKmlOverlay) Color.White else KakaoColors.PrimaryDark,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
 
@@ -654,7 +746,7 @@ fun SatelliteMapScreen(
                         .clickable {
                             activeKebun?.let {
                                 coroutineScope.launch {
-                                    cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(it.centerLocation, 17f), 800)
+                                    mapCenterTrigger = Pair(GeoPoint(it.centerLocation.latitude, it.centerLocation.longitude), 17.toDouble())
                                 }
                             }
                         }

@@ -34,6 +34,7 @@ fun PlantationBottomSheet(
     onBlokSelected: (BlokBagian?) -> Unit,
     onPohonSelected: (PohonKakao?) -> Unit,
     onStatusChange: (PohonKakao, PohonStatus) -> Unit,
+    onReportKondisi: (PohonKakao) -> Unit = {},
     onAddPohon: (BlokBagian, PohonKakao) -> Unit = { _, _ -> },
     onSelfMappingClick: () -> Unit = {}
 ) {
@@ -49,7 +50,7 @@ fun PlantationBottomSheet(
                 TreeDetailPanel(
                     pohon = selectedPohon,
                     blok = selectedBlok ?: kebun.blokList.firstOrNull(),
-                    onStatusChange = { newStatus -> onStatusChange(selectedPohon, newStatus) }
+                    onReportKondisi = { onReportKondisi(selectedPohon) }
                 )
             }
             selectedBlok != null -> {
@@ -326,7 +327,7 @@ private fun TreeListPanel(
 private fun TreeDetailPanel(
     pohon: PohonKakao,
     blok: BlokBagian?,
-    onStatusChange: (PohonStatus) -> Unit
+    onReportKondisi: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         // Profile Card Pohon
@@ -405,40 +406,16 @@ private fun TreeDetailPanel(
                 HorizontalDivider(color = KakaoColors.Divider, thickness = 0.6.dp)
                 Spacer(Modifier.height(10.dp))
 
-                Text("Perbarui Status Kesehatan:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = KakaoColors.PrimaryDark)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
-                    Button(
-                        onClick = { onStatusChange(PohonStatus.SEHAT) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (pohon.status == PohonStatus.SEHAT) KakaoColors.StepActive else KakaoColors.SurfaceMuted,
-                            contentColor = if (pohon.status == PohonStatus.SEHAT) Color.White else KakaoColors.TextPrimary
-                        ),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f).height(32.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) { Text("Sehat", fontSize = 11.sp, fontWeight = FontWeight.Bold) }
-
-                    Button(
-                        onClick = { onStatusChange(PohonStatus.PERLU_PUPUK) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (pohon.status == PohonStatus.PERLU_PUPUK) KakaoColors.Warning else KakaoColors.SurfaceMuted,
-                            contentColor = if (pohon.status == PohonStatus.PERLU_PUPUK) Color.White else KakaoColors.TextPrimary
-                        ),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f).height(32.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) { Text("Pupuk", fontSize = 11.sp, fontWeight = FontWeight.Bold) }
-
-                    Button(
-                        onClick = { onStatusChange(PohonStatus.TERSERANG_HAMA) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (pohon.status == PohonStatus.TERSERANG_HAMA) KakaoColors.Error else KakaoColors.SurfaceMuted,
-                            contentColor = if (pohon.status == PohonStatus.TERSERANG_HAMA) Color.White else KakaoColors.TextPrimary
-                        ),
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.weight(1f).height(32.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) { Text("Hama", fontSize = 11.sp, fontWeight = FontWeight.Bold) }
+                Button(
+                    onClick = onReportKondisi,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = KakaoColors.Primary,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth().height(48.dp)
+                ) {
+                    Text("Lapor Kondisi via Foto", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

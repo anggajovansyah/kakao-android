@@ -6,55 +6,69 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Design tokens terpusat untuk seluruh UI Kakao Digital.
+ * Palet warna diselaraskan dengan prototipe reference 2.0 —
+ * hijau kanopi kakao sebagai warna utama (#175c40), kuning-merah
+ * buah matang sebagai tangga status. Sama persis dengan dashboard
+ * penyuluh, supaya petani dan penyuluh melihat warna yang sama
+ * untuk hal yang sama.
+ *
  * Semua screen & component WAJIB mereferensikan object ini —
  * dilarang hardcode warna/radius/spacing secara inline.
  */
 
 object KakaoColors {
-    // ── Brand ──
-    val Primary         = Color(0xFF2E7D32)
-    val PrimaryDark     = Color(0xFF1B5E20)
-    val PrimaryLight    = Color(0xFF4CAF50)
-    val PrimaryContainer = Color(0xFFE8F5E9)
+    // ── Brand (hijau kanopi kakao — reference 2.0) ──
+    val Primary         = Color(0xFF175C40)   // --hijau
+    val PrimaryDark     = Color(0xFF0F3D2B)   // --hijau-tua
+    val PrimaryLight    = Color(0xFF2E9E5B)   // --sehat (juga hijau muda aktif)
+    val PrimaryContainer = Color(0xFFE7F2EC)  // --hijau-muda
 
     // ── Surface & Background ──
-    val Background      = Color(0xFFF8F9FA)
-    val Surface         = Color(0xFFFFFFFF)
-    val SurfaceMuted    = Color(0xFFF1F5F9)
+    val Background      = Color(0xFFF2F5F2)   // --kertas
+    val Surface         = Color(0xFFFFFFFF)   // --kartu
+    val SurfaceMuted    = Color(0xFFF7F9F8)   // kartu muted/dashed
 
     // ── Text ──
-    val TextPrimary     = Color(0xFF1E293B)
-    val TextSecondary   = Color(0xFF64748B)
-    val TextMuted       = Color(0xFF94A3B8)
+    val TextPrimary     = Color(0xFF132019)   // --teks
+    val TextSecondary   = Color(0xFF5B6F66)   // --teks2
+    val TextMuted       = Color(0xFF8A9A94)   // --teks3
 
-    // ── Status ──
-    val Warning         = Color(0xFFF57F17)
-    val WarningContainer = Color(0xFFFFF8E1)
-    val WarningText     = Color(0xFF7A4F01)
-    val Error           = Color(0xFFC62828)
-    val ErrorContainer  = Color(0xFFFFEBEE)
-    val Success         = Color(0xFF2E7D32)
-    val SuccessContainer = Color(0xFFE8F5E9)
+    // ── Status (tangga warna buah kakao — identik dashboard) ──
+    val Sehat           = Color(0xFF2E9E5B)   // --sehat (hijau buah muda)
+    val Pantau          = Color(0xFFE0A12A)   // --pantau (kuning buah masak)
+    val Rawat           = Color(0xFFE0703B)   // --rawat / perlu_perawatan (oranye)
+    val Kritis          = Color(0xFFC0392B)   // --kritis (merah buah busuk)
+    val BelumAdaData    = Color(0xFF8A9A94)   // --kosong (abu-abu)
+
+    // ── Alias status lama (backward compat) ──
+    val Warning         = Pantau
+    val WarningContainer = Color(0xFFFFF8E8)  // saran background kuning
+    val WarningText     = Color(0xFF7A5A12)
+    val Error           = Kritis
+    val ErrorContainer  = Color(0xFFFDF3F1)   // --kritis background
+    val Success         = Sehat
+    val SuccessContainer = PrimaryContainer
 
     // ── Stepper ──
-    val StepActive      = Color(0xFF2E7D32)
-    val StepCompleted   = Color(0xFF4CAF50)
-    val StepPending     = Color(0xFFE2E8F0)
-    val StepTextInactive = Color(0xFF64748B)
+    val StepActive      = Primary
+    val StepCompleted   = PrimaryLight
+    val StepPending     = Color(0xFFDFE6E1)   // --garis
+    val StepTextInactive = TextSecondary
 
-    // ── Divider ──
-    val Divider         = Color(0xFFE2E8F0)
+    // ── Divider & Garis ──
+    val Divider         = Color(0xFFDFE6E1)   // --garis
 }
 
 object KakaoRadius {
-    val Small:  Dp = 12.dp
-    val Medium: Dp = 14.dp
-    val Large:  Dp = 16.dp
-    val XL:     Dp = 20.dp
-    val XXL:    Dp = 24.dp
-    val Card:   Dp = 24.dp
-    val Button: Dp = 16.dp
-    val Input:  Dp = 16.dp
+    val Small:  Dp = 13.dp     // input/chip radius (reference: 13px)
+    val Medium: Dp = 15.dp     // foto-hasil, kartu kecil
+    val Large:  Dp = 17.dp     // kartu utama (reference: 17px)
+    val XL:     Dp = 20.dp     // chip rounded
+    val XXL:    Dp = 24.dp     // bottom sheet, modal
+    val Card:   Dp = 17.dp     // sesuai reference .kartu: 17px
+    val Button: Dp = 15.dp     // sesuai reference .tbl: 15px
+    val Input:  Dp = 13.dp     // sesuai reference .isian: 13px
+    val Hero:   Dp = 26.dp     // hero section bottom corners
 }
 
 object KakaoElevation {
@@ -73,10 +87,10 @@ object KakaoSpacing {
     val XXL: Dp = 32.dp
     val XXXL: Dp = 40.dp
 
-    /** Standard horizontal padding for screen content to guarantee breathing room */
-    val ScreenHorizontal: Dp = 24.dp
+    /** Standard horizontal padding for screen content (reference: 20px .pad) */
+    val ScreenHorizontal: Dp = 20.dp
     /** Standard vertical padding for screen content */
-    val ScreenVertical: Dp = 24.dp
+    val ScreenVertical: Dp = 20.dp
 }
 
 object KakaoSizes {
@@ -85,4 +99,5 @@ object KakaoSizes {
     val IconMedium:   Dp = 24.dp
     val IconLarge:    Dp = 40.dp
     val HeaderLogoHeight: Dp = 32.dp
+    val BottomNavHeight: Dp = 64.dp
 }
