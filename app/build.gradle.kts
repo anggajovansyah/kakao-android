@@ -7,6 +7,8 @@ plugins {
 }
 
 // Membaca rahasia MAPS_API_KEY dari file .env atau local.properties
+// Jika tidak ada, peta Google Maps tetap berjalan (dengan watermark)
+// dan KML overlay dari assets/ tetap berfungsi penuh secara luring.
 val envProperties = Properties()
 val envFile = rootProject.file(".env")
 if (envFile.exists()) {
@@ -16,7 +18,7 @@ val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     envProperties.load(FileInputStream(localPropertiesFile))
 }
-val mapsApiKey: String = envProperties.getProperty("MAPS_API_KEY") ?: "YOUR_MAPS_API_KEY_HERE"
+val mapsApiKey: String = envProperties.getProperty("MAPS_API_KEY") ?: ""
 
 
 android {
@@ -61,6 +63,7 @@ android {
 dependencies {
     // Compose
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.material3:material3")
@@ -92,8 +95,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
     // Maps for kebun mapping (pinning garden location & GIS utilities)
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.maps.android:maps-compose:4.4.1")
+    implementation("com.google.android.gms:play-services-maps:18.2.0") // kept for LatLng models
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
     implementation("com.google.android.gms:play-services-location:21.3.0")
-    implementation("com.google.maps.android:android-maps-utils:3.8.2")
 }

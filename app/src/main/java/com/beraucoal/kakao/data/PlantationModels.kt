@@ -21,6 +21,12 @@ enum class SyncStatus(val label: String) {
     SYNC_FAILED("Gagal Sync")
 }
 
+enum class BagianPohon {
+    BATANG,
+    DAUN,
+    BUAH
+}
+
 enum class PohonInputMethod(val label: String) {
     GPS_LAPANGAN("Sensor GPS Lapangan"),
     MANUAL_TAP_PETA("Tap Manual Peta")
@@ -32,6 +38,21 @@ data class RiwayatPelaporan(
     val status: PohonStatus,
     val catatan: String,
     val pelapor: String = "Tim Agronomi & Petani"
+)
+
+data class FotoLaporan(
+    val id: String,
+    val uri: String,
+    val bagian: BagianPohon
+)
+
+data class LaporanPohon(
+    val id: String,
+    val pohonId: String,
+    val timestamp: String,
+    val fotoList: List<FotoLaporan>,
+    val catatan: String,
+    val syncStatus: SyncStatus = SyncStatus.PENDING_SYNC
 )
 
 data class PohonKakao(

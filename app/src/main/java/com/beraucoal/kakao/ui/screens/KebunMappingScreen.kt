@@ -22,9 +22,14 @@ import com.beraucoal.kakao.UiState
 import com.beraucoal.kakao.ui.components.*
 import com.beraucoal.kakao.ui.theme.*
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import androidx.compose.ui.viewinterop.AndroidView
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.util.MapTileIndex
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker as OsmMarker
 
 @Composable
 fun KebunMappingScreen(
@@ -38,8 +43,11 @@ fun KebunMappingScreen(
     var pinnedLocation by remember { mutableStateOf<LatLng?>(null) }
     var luasHektarText by remember { mutableStateOf("") }
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultLocation, 12f)
+    var mapCenterTrigger by remember { mutableStateOf<Pair<GeoPoint, Double>?>(null) }
+    
+    LaunchedEffect(Unit) {
+        Configuration.getInstance().userAgentValue = context.packageName
+        mapCenterTrigger = Pair(GeoPoint(defaultLocation.latitude, defaultLocation.longitude), 12.0)
     }
 
     val hasLocationPermission = ContextCompat.checkSelfPermission(
@@ -81,28 +89,61 @@ fun KebunMappingScreen(
                     .weight(1f)
                     .padding(horizontal = 20.dp, vertical = 6.dp)
             ) {
-                GoogleMap(
+                AndroidView(
                     modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState,
-                    properties = MapProperties(isMyLocationEnabled = hasLocationPermission, mapType = MapType.HYBRID),
-                    onMapClick = { latLng -> pinnedLocation = latLng }
-                ) {
-                    pinnedLocation?.let { loc ->
-                        val markerState = remember { MarkerState(position = loc) }
-                        LaunchedEffect(loc) {
-                            if (markerState.position != loc) markerState.position = loc
+                    factory = { ctx ->
+                        MapView(ctx).apply {
+                            setMultiTouchControls(true)
+                            val tileSource = object : OnlineTileSourceBase(
+                                "EsriWorldImagery", 1, 19, 256, ".png",
+                                arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/")
+                            ) {
+                                override fun getTileURLString(pMapTileIndex: Long): String {
+                                    return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" + MapTileIndex.getY(pMapTileIndex) + "/" + MapTileIndex.getX(pMapTileIndex)
+                                }
+                            }
+                            setTileSource(tileSource)
                         }
-                        LaunchedEffect(markerState.position) {
-                            if (pinnedLocation != markerState.position) pinnedLocation = markerState.position
+                    },
+                    update = { mapView ->
+                        mapCenterTrigger?.let { (center, zoom) ->
+                            mapView.controller.setZoom(zoom)
+                            mapView.controller.animateTo(center)
+                            mapCenterTrigger = null
                         }
-                        Marker(
-                            state = markerState,
-                            title = "Lokasi Kebun Kakao",
-                            snippet = "Tahan & geser (drag) pin untuk ubah posisi manual",
-                            draggable = true
-                        )
+                        
+                        val mReceive = object : org.osmdroid.views.overlay.Overlay() {
+                            override fun onSingleTapConfirmed(e: android.view.MotionEvent, mapView: MapView): Boolean {
+                                val proj = mapView.projection
+                                val loc = proj.fromPixels(e.x.toInt(), e.y.toInt())
+                                pinnedLocation = LatLng(loc.latitude, loc.longitude)
+                                return true
+                            }
+                        }
+                        
+                        mapView.overlays.clear()
+                        mapView.overlays.add(mReceive)
+                        
+                        pinnedLocation?.let { loc ->
+                            val m = OsmMarker(mapView)
+                            m.position = GeoPoint(loc.latitude, loc.longitude)
+                            m.title = "Lokasi Kebun Kakao"
+                            m.snippet = "Tahan & geser (drag) pin untuk ubah posisi manual"
+                            m.isDraggable = true
+                            m.setOnMarkerDragListener(object : OsmMarker.OnMarkerDragListener {
+                                override fun onMarkerDrag(marker: OsmMarker?) {}
+                                override fun onMarkerDragEnd(marker: OsmMarker?) {
+                                    marker?.let {
+                                        pinnedLocation = LatLng(it.position.latitude, it.position.longitude)
+                                    }
+                                }
+                                override fun onMarkerDragStart(marker: OsmMarker?) {}
+                            })
+                            mapView.overlays.add(m)
+                        }
+                        mapView.invalidate()
                     }
-                }
+                )
             }
 
             Spacer(Modifier.height(16.dp))
@@ -124,7 +165,7 @@ fun KebunMappingScreen(
                                     if (loc != null) {
                                         val latLng = LatLng(loc.latitude, loc.longitude)
                                         pinnedLocation = latLng
-                                        cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 16f)
+                                        mapCenterTrigger = Pair(GeoPoint(latLng.latitude, latLng.longitude), 16.0)
                                     }
                                 }
                             },

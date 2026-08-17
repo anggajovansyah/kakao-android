@@ -13,8 +13,13 @@ import androidx.compose.ui.unit.sp
 import com.beraucoal.kakao.R
 
 /**
- * KakaoTheme — wrapping Material3 dengan custom palette hijau pertanian
- * dan Google Fonts Poppins sebagai tipografi utama.
+ * KakaoTheme — wrapping Material3 dengan custom palette hijau kanopi kakao
+ * dan Google Fonts Plus Jakarta Sans sebagai tipografi utama (sesuai reference 2.0).
+ *
+ * Font dipilih Plus Jakarta Sans karena:
+ * - Dirancang untuk UI Indonesia (Latin Extended mendukung aksara lokal)
+ * - Weight 400-800 yang dipakai prototipe tersedia semua
+ * - Lebih tegas dan modern dibanding Poppins untuk angka (tabel status kebun)
  */
 
 private val googleFontProvider = GoogleFont.Provider(
@@ -23,30 +28,38 @@ private val googleFontProvider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 
-private val poppinsFont = GoogleFont("Poppins")
+private val plusJakartaSansFont = GoogleFont("Plus Jakarta Sans")
 
-val PoppinsFontFamily = FontFamily(
-    Font(googleFont = poppinsFont, fontProvider = googleFontProvider, weight = FontWeight.Normal),
-    Font(googleFont = poppinsFont, fontProvider = googleFontProvider, weight = FontWeight.Medium),
-    Font(googleFont = poppinsFont, fontProvider = googleFontProvider, weight = FontWeight.SemiBold),
-    Font(googleFont = poppinsFont, fontProvider = googleFontProvider, weight = FontWeight.Bold),
-    Font(googleFont = poppinsFont, fontProvider = googleFontProvider, weight = FontWeight.ExtraBold),
+val PlusJakartaSansFontFamily = FontFamily(
+    Font(googleFont = plusJakartaSansFont, fontProvider = googleFontProvider, weight = FontWeight.Normal),
+    Font(googleFont = plusJakartaSansFont, fontProvider = googleFontProvider, weight = FontWeight.Medium),
+    Font(googleFont = plusJakartaSansFont, fontProvider = googleFontProvider, weight = FontWeight.SemiBold),
+    Font(googleFont = plusJakartaSansFont, fontProvider = googleFontProvider, weight = FontWeight.Bold),
+    Font(googleFont = plusJakartaSansFont, fontProvider = googleFontProvider, weight = FontWeight.ExtraBold),
 )
 
+// Backward compat alias — file lama yang import PoppinsFontFamily tetap compile
+val PoppinsFontFamily = PlusJakartaSansFontFamily
+
 private val KakaoTypography = Typography(
-    displayLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Bold, fontSize = 30.sp, letterSpacing = (-0.25).sp),
-    headlineLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Bold, fontSize = 24.sp),
-    headlineMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Bold, fontSize = 22.sp),
-    headlineSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Bold, fontSize = 20.sp),
-    titleLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.SemiBold, fontSize = 18.sp),
-    titleMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
-    titleSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.SemiBold, fontSize = 14.sp),
-    bodyLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 16.sp),
-    bodyMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp),
-    bodySmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp),
-    labelLarge = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Bold, fontSize = 15.sp),
-    labelMedium = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Medium, fontSize = 13.sp),
-    labelSmall = TextStyle(fontFamily = PoppinsFontFamily, fontWeight = FontWeight.Medium, fontSize = 11.sp),
+    // Display: judul besar ala splash / hero
+    displayLarge = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.ExtraBold, fontSize = 31.sp, letterSpacing = (-0.03).sp),
+    // Headline: judul layar utama
+    headlineLarge = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.ExtraBold, fontSize = 25.sp, letterSpacing = (-0.028).sp),
+    headlineMedium = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Bold, fontSize = 22.sp, letterSpacing = (-0.02).sp),
+    headlineSmall = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Bold, fontSize = 19.sp, letterSpacing = (-0.02).sp),
+    // Title: sub-judul, nama kebun
+    titleLarge = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Bold, fontSize = 17.sp, letterSpacing = (-0.015).sp),
+    titleMedium = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Bold, fontSize = 15.5.sp),
+    titleSmall = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Bold, fontSize = 14.5.sp),
+    // Body: teks isi
+    bodyLarge = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Normal, fontSize = 15.sp, lineHeight = 22.5.sp),
+    bodyMedium = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Normal, fontSize = 13.sp, lineHeight = 19.5.sp),
+    bodySmall = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.5.sp, lineHeight = 18.75.sp),
+    // Label: chip, badge, eyebrow, tombol
+    labelLarge = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Bold, fontSize = 15.5.sp),
+    labelMedium = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.SemiBold, fontSize = 12.5.sp),
+    labelSmall = TextStyle(fontFamily = PlusJakartaSansFontFamily, fontWeight = FontWeight.Bold, fontSize = 10.5.sp, letterSpacing = 0.15.sp),
 )
 
 private val KakaoColorScheme = lightColorScheme(

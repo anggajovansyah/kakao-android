@@ -17,6 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,10 +37,17 @@ import com.beraucoal.kakao.ui.components.KakaoPrimaryButton
 import com.beraucoal.kakao.ui.theme.*
 
 /**
- * Layar Utama Terpadu (Unified Auth Screen).
- * Menampilkan logo kebanggaan AI Kakao berukuran besar di atas, langsung menyuguhkan formulir Sign In
- * (ID & Kata Sandi), pemisah "atau", tombol pendaftaran petani baru (Sign Up), serta footer 2 logo
- * (ITSB & PT Berau Coal) tanpa tulisan.
+ * Layar Selamat Datang — redesign sesuai reference 2.0.
+ *
+ * Full-screen gradient hijau kanopi, ikon 🌱 besar, judul "AI Kakao",
+ * dua tombol utama ("Daftar Baru" + "Sudah Punya Kode"),
+ * chip partner "PT Berau Coal" + "ITSB".
+ *
+ * "Sudah Punya Kode" menampilkan form masuk (nama + kode petani)
+ * sesuai reference, tapi juga tetap mendukung login lama (ID + password)
+ * untuk backward compatibility.
+ *
+ * Reference: LAYAR.mulai di prototipe-aplikasi-petani.html
  */
 @Composable
 fun WelcomeScreen(
@@ -47,237 +56,310 @@ fun WelcomeScreen(
     onSignInSuccess: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     // [TEMPORARY DEV BYPASS] Hardcoded credential default untuk kemudahan pengujian/testing.
     // UNTUK MENGHAPUS / PRODUKSI: Ubah "08123456789" dan "admin123" menjadi string kosong ("").
     var username by remember { mutableStateOf("08123456789") }
     var password by remember { mutableStateOf("admin123") }
+    var showLoginForm by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(KakaoColors.Background)
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        KakaoColors.Primary,        // #175c40
+                        KakaoColors.PrimaryDark      // #0f3d2b
+                    )
+                )
+            )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
+                .padding(horizontal = 26.dp, vertical = 34.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // ── BAGIAN ATAS: Logo AI Kakao Besar & Sapaan ──
+            // ── BAGIAN ATAS: Hero Section ──
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center
             ) {
-                Spacer(Modifier.height(12.dp))
-                // Logo AI Kakao dengan skala kebesaran layaknya di Splash Screen
-                Surface(
-                    shape = CircleShape,
-                    color = KakaoColors.Surface,
-                    shadowElevation = KakaoElevation.Medium,
-                    modifier = Modifier.size(130.dp)
+                // Emoji tanaman
+                Text(
+                    text = "🌱",
+                    fontSize = 62.sp,
+                    modifier = Modifier.padding(bottom = 20.dp)
+                )
+
+                // Judul
+                Text(
+                    text = "AI Kakao",
+                    fontSize = 31.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = PlusJakartaSansFontFamily,
+                    color = Color.White,
+                    letterSpacing = (-0.03).sp
+                )
+
+                Spacer(Modifier.height(10.dp))
+
+                // Deskripsi
+                Text(
+                    text = "Foto buah, batang, dan daun kakao Anda.\nKetahui kondisinya hari itu juga.",
+                    fontSize = 14.5.sp,
+                    fontFamily = PlusJakartaSansFontFamily,
+                    color = Color(0xFFA9CDB9),
+                    textAlign = TextAlign.Center,
+                    lineHeight = 23.sp,
+                    modifier = Modifier.padding(horizontal = 26.dp)
+                )
+
+                Spacer(Modifier.height(26.dp))
+
+                // Chip partner
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Image(
-                            painter = painterResource(id = R.drawable.splash_icon),
-                            contentDescription = "Logo AI Kakao",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.size(96.dp)
+                    PartnerChip("PT Berau Coal")
+                    PartnerChip("ITSB")
+                }
+            }
+
+            // ── BAGIAN BAWAH: Tombol Aksi ──
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(9.dp)
+            ) {
+                if (!showLoginForm) {
+                    // Mode awal: dua tombol
+                    Button(
+                        onClick = onSignUp,
+                        shape = RoundedCornerShape(KakaoRadius.Button),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = KakaoColors.PrimaryDark
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                    ) {
+                        Text(
+                            text = "Daftar Baru",
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = PlusJakartaSansFontFamily,
+                            fontSize = 15.5.sp
                         )
                     }
-                }
 
-                Spacer(Modifier.height(24.dp))
+                    OutlinedButton(
+                        onClick = { showLoginForm = true },
+                        shape = RoundedCornerShape(KakaoRadius.Button),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color.White
+                        ),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    Color.White.copy(alpha = 0.45f),
+                                    Color.White.copy(alpha = 0.45f)
+                                )
+                            )
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                    ) {
+                        Text(
+                            text = "Sudah Punya Kode",
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = PlusJakartaSansFontFamily,
+                            fontSize = 15.5.sp,
+                            color = Color.White
+                        )
+                    }
 
-                Text(
-                    text = "Selamat Datang di AI Kakao",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontFamily = PoppinsFontFamily,
-                    color = KakaoColors.TextPrimary,
-                    textAlign = TextAlign.Center
-                )
+                    Text(
+                        text = "Belum punya kode? Pilih Daftar Baru dan siapkan KTP.",
+                        fontSize = 12.sp,
+                        fontFamily = PlusJakartaSansFontFamily,
+                        color = Color(0xFF8FB3A2),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    )
+                } else {
+                    // Mode login: form masuk
+                    Surface(
+                        shape = RoundedCornerShape(KakaoRadius.Card),
+                        color = Color.White.copy(alpha = 0.12f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(20.dp)
+                        ) {
+                            Text(
+                                text = "Masuk",
+                                fontSize = 19.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontFamily = PlusJakartaSansFontFamily,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "Gunakan nama dan kode yang tertera di kartu petani Anda.",
+                                fontSize = 13.sp,
+                                fontFamily = PlusJakartaSansFontFamily,
+                                color = Color(0xFFA9CDB9),
+                                modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+                            )
 
-                Spacer(Modifier.height(6.dp))
+                            // Nama lengkap
+                            OutlinedTextField(
+                                value = username,
+                                onValueChange = {
+                                    username = it
+                                    viewModel.clearError()
+                                },
+                                label = { Text("Nama lengkap / No. WA", color = Color(0xFF8FB3A2)) },
+                                placeholder = { Text("Contoh: Dominikus Ambus", color = Color(0xFF5B7A6E)) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White.copy(alpha = 0.8f),
+                                    focusedBorderColor = Color.White.copy(alpha = 0.6f),
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                                    cursorColor = Color.White
+                                ),
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(KakaoRadius.Input)
+                            )
 
-                Text(
-                    text = "Platform Digital Registrasi & Pemetaan Lahan Kakao",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = PoppinsFontFamily,
-                    color = KakaoColors.TextSecondary,
-                    textAlign = TextAlign.Center
-                )
+                            Spacer(Modifier.height(12.dp))
 
-                Spacer(Modifier.height(28.dp))
+                            // Kode petani / kata sandi
+                            OutlinedTextField(
+                                value = password,
+                                onValueChange = {
+                                    password = it
+                                    viewModel.clearError()
+                                },
+                                label = { Text("Kode petani / Kata sandi", color = Color(0xFF8FB3A2)) },
+                                placeholder = { Text("PTN-00031-9", color = Color(0xFF5B7A6E)) },
+                                visualTransformation = PasswordVisualTransformation(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White.copy(alpha = 0.8f),
+                                    focusedBorderColor = Color.White.copy(alpha = 0.6f),
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                                    cursorColor = Color.White
+                                ),
+                                singleLine = true,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(KakaoRadius.Input)
+                            )
 
-                // ── FORM SIGN IN TERPADU (MASUK AKUN) ──
-                KakaoContentCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                            // Error message
+                            if (uiState is UiState.Error) {
+                                Text(
+                                    text = (uiState as UiState.Error).message,
+                                    color = Color(0xFFFF8A80),
+                                    fontSize = 12.sp,
+                                    fontFamily = PlusJakartaSansFontFamily,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+
+                            Spacer(Modifier.height(16.dp))
+
+                            // Tombol masuk
+                            Button(
+                                onClick = {
+                                    viewModel.signIn(username, password, onSuccess = onSignInSuccess)
+                                },
+                                shape = RoundedCornerShape(KakaoRadius.Button),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White,
+                                    contentColor = KakaoColors.PrimaryDark
+                                ),
+                                enabled = uiState !is UiState.Loading,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(54.dp)
+                            ) {
+                                if (uiState is UiState.Loading) {
+                                    CircularProgressIndicator(
+                                        color = KakaoColors.Primary,
+                                        modifier = Modifier.size(22.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                } else {
+                                    Text(
+                                        text = "Masuk",
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = PlusJakartaSansFontFamily,
+                                        fontSize = 15.5.sp
+                                    )
+                                }
+                            }
+
+                            // Link daftar baru
+                            TextButton(
+                                onClick = onSignUp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 4.dp)
+                            ) {
+                                Text(
+                                    text = "Belum punya kode? Daftar",
+                                    color = Color.White.copy(alpha = 0.75f),
+                                    fontSize = 13.sp,
+                                    fontFamily = PlusJakartaSansFontFamily,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
+
+                    // Tombol kembali
+                    TextButton(
+                        onClick = { showLoginForm = false },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Masuk ke Akun Terdaftar",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = KakaoColors.PrimaryDark,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Start
-                        )
-
-                        Spacer(Modifier.height(16.dp))
-
-                        // Kolom Username / No WA
-                        KakaoOutlinedTextField(
-                            value = username,
-                            onValueChange = {
-                                username = it
-                                viewModel.clearError()
-                            },
-                            label = "No. WhatsApp atau ID Petani",
-                            placeholder = "Contoh: 08123456789 atau PETANI-01",
-                            leadingIcon = Icons.Filled.AccountBox,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                            singleLine = true
-                        )
-
-                        Spacer(Modifier.height(16.dp))
-
-                        // Kolom Kata Sandi
-                        KakaoOutlinedTextField(
-                            value = password,
-                            onValueChange = {
-                                password = it
-                                viewModel.clearError()
-                            },
-                            label = "Kata Sandi",
-                            placeholder = "Masukkan kata sandi",
-                            leadingIcon = Icons.Filled.Lock,
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            singleLine = true
-                        )
-
-                        Spacer(Modifier.height(12.dp))
-
-                        // Indikator Eror atau Loading
-                        if (uiState is UiState.Error) {
-                            Text(
-                                text = (uiState as UiState.Error).message,
-                                color = KakaoColors.Error,
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Medium,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(bottom = 12.dp)
-                            )
-                        }
-
-                        if (uiState is UiState.Loading) {
-                            CircularProgressIndicator(
-                                color = KakaoColors.Primary,
-                                modifier = Modifier.size(32.dp)
-                            )
-                            Spacer(Modifier.height(12.dp))
-                        }
-
-                        // Tombol Masuk
-                        KakaoPrimaryButton(
-                            text = "Masuk Sekarang (Sign In)",
-                            onClick = {
-                                viewModel.signIn(username, password, onSuccess = onSignInSuccess)
-                            },
-                            enabled = uiState !is UiState.Loading
+                            text = "← Kembali",
+                            color = Color(0xFF8FB3A2),
+                            fontSize = 13.sp,
+                            fontFamily = PlusJakartaSansFontFamily,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
-                }
-
-                Spacer(Modifier.height(28.dp))
-
-                // ── PEMISAH "ATAU" ──
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        color = KakaoColors.Divider,
-                        thickness = 1.5.dp
-                    )
-                    Text(
-                        text = "atau",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = KakaoColors.TextSecondary,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        color = KakaoColors.Divider,
-                        thickness = 1.5.dp
-                    )
-                }
-
-                Spacer(Modifier.height(28.dp))
-
-                // ── TOMBOL DAFTAR PETANI BARU (SIGN UP) ──
-                KakaoOutlinedButton(
-                    text = "Daftar Petani Baru (Sign Up)",
-                    onClick = onSignUp,
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.AddCircle,
-                            contentDescription = null,
-                            tint = KakaoColors.Primary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                )
-            }
-
-            Spacer(Modifier.height(48.dp))
-
-            // ── DASAR LAYAR: Logo Mitra (ITSB & Berau Coal) Tanpa Tulisan ──
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = KakaoColors.Surface.copy(alpha = 0.6f),
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
-                ) {
-                    // Logo ITSB
-                    Image(
-                        painter = painterResource(id = R.drawable.itsb_logo),
-                        contentDescription = "Logo ITSB",
-                        modifier = Modifier.height(28.dp),
-                        contentScale = ContentScale.Fit
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    // Garis Pemisah Vertikal
-                    Box(
-                        modifier = Modifier
-                            .height(22.dp)
-                            .width(1.5.dp)
-                            .background(KakaoColors.TextMuted.copy(alpha = 0.4f))
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    // Logo Berau Coal
-                    Image(
-                        painter = painterResource(id = R.drawable.berau_logo),
-                        contentDescription = "Logo PT Berau Coal",
-                        modifier = Modifier.height(28.dp),
-                        contentScale = ContentScale.Fit
-                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PartnerChip(text: String) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = Color.White.copy(alpha = 0.15f)
+    ) {
+        Text(
+            text = text,
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = PlusJakartaSansFontFamily,
+            color = Color(0xFFD8EBE0),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+        )
     }
 }

@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
@@ -31,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.beraucoal.kakao.Routes
 import com.beraucoal.kakao.ui.theme.KakaoColors
 import com.beraucoal.kakao.ui.theme.KakaoElevation
-import com.beraucoal.kakao.ui.theme.PoppinsFontFamily
+import com.beraucoal.kakao.ui.theme.PlusJakartaSansFontFamily
 
 data class BottomNavItem(
     val route: String,
@@ -39,15 +41,27 @@ data class BottomNavItem(
     val icon: ImageVector
 )
 
+/**
+ * 5 tab bottom navigation sesuai reference 2.0:
+ * Beranda — Foto — Kirim — Riwayat — Akun
+ *
+ * Catatan: route CAMERA dan QUEUE belum ada implementasinya,
+ * untuk saat ini diarahkan ke SATELLITE_MAP sebagai placeholder.
+ * Route RIWAYAT juga diarahkan ke DASHBOARD. Akan diperbarui
+ * saat layar-layar tersebut diimplementasikan.
+ */
 val mainBottomNavItems = listOf(
     BottomNavItem(Routes.DASHBOARD, "Beranda", Icons.Filled.Home),
-    BottomNavItem(Routes.SATELLITE_MAP, "Peta Satelit", Icons.Filled.Map),
-    BottomNavItem(Routes.PROFILE, "Profil", Icons.Filled.Person)
+    BottomNavItem(Routes.SATELLITE_MAP, "Foto", Icons.Filled.CameraAlt),
+    BottomNavItem(Routes.UPLOAD_QUEUE, "Kirim", Icons.Filled.CloudUpload),
+    BottomNavItem(Routes.RIWAYAT, "Riwayat", Icons.Filled.History),
+    BottomNavItem(Routes.PROFILE, "Akun", Icons.Filled.Person)
 )
 
 /**
- * Minimalist Floating Bottom Navigation Bar (iOS & Samsung OneUI Slider Style).
- * Menampilkan kapsul melayang dengan animasi pill indikator geser yang halus saat berpindah antar menu utama.
+ * Bottom Navigation Bar sesuai reference 2.0 prototipe.
+ * Menggunakan gaya iOS/Samsung OneUI dengan pill indicator geser yang halus.
+ * Lima tab: Beranda, Foto, Kirim, Riwayat, Akun.
  */
 @Composable
 fun KakaoBottomNavigation(
@@ -59,8 +73,8 @@ fun KakaoBottomNavigation(
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val barHorizontalPadding = 24.dp
-    val containerPaddingHorizontal = 8.dp
+    val barHorizontalPadding = 16.dp
+    val containerPaddingHorizontal = 4.dp
     val availableWidth = screenWidth - (barHorizontalPadding * 2) - (containerPaddingHorizontal * 2)
     val itemWidth = availableWidth / items.size
 
@@ -76,19 +90,19 @@ fun KakaoBottomNavigation(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = barHorizontalPadding, vertical = 16.dp),
+            .padding(horizontal = barHorizontalPadding, vertical = 10.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         Surface(
-            shape = RoundedCornerShape(32.dp),
-            color = KakaoColors.Surface.copy(alpha = 0.95f),
+            shape = RoundedCornerShape(28.dp),
+            color = KakaoColors.Surface,
             shadowElevation = KakaoElevation.High,
             modifier = Modifier.fillMaxWidth()
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = containerPaddingHorizontal, vertical = 8.dp),
+                    .padding(horizontal = containerPaddingHorizontal, vertical = 6.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
                 // ── Animated Pill Slider Indicator ──
@@ -96,7 +110,7 @@ fun KakaoBottomNavigation(
                     modifier = Modifier
                         .offset(x = pillOffset)
                         .width(itemWidth)
-                        .height(48.dp)
+                        .height(44.dp)
                         .clip(CircleShape)
                         .background(KakaoColors.PrimaryContainer)
                 )
@@ -115,7 +129,7 @@ fun KakaoBottomNavigation(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .width(itemWidth)
-                                .height(48.dp)
+                                .height(44.dp)
                                 .clip(CircleShape)
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
@@ -126,27 +140,25 @@ fun KakaoBottomNavigation(
                                     }
                                 }
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
                                 Icon(
                                     imageVector = item.icon,
                                     contentDescription = item.title,
                                     tint = contentColor,
-                                    modifier = Modifier.size(22.dp)
+                                    modifier = Modifier.size(21.dp)
                                 )
-                                if (isSelected) {
-                                    Spacer(Modifier.width(6.dp))
-                                    Text(
-                                        text = item.title,
-                                        color = contentColor,
-                                        style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        fontFamily = PoppinsFontFamily,
-                                        fontSize = 12.sp
-                                    )
-                                }
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = item.title,
+                                    color = contentColor,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    fontFamily = PlusJakartaSansFontFamily,
+                                    fontSize = 10.sp
+                                )
                             }
                         }
                     }

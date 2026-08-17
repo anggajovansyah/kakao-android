@@ -29,10 +29,18 @@ import com.beraucoal.kakao.data.PlantationRepository
 import com.beraucoal.kakao.ui.components.KakaoOutlinedTextField
 import com.beraucoal.kakao.ui.theme.KakaoColors
 import com.beraucoal.kakao.ui.theme.PoppinsFontFamily
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.SphericalUtil
-import com.google.maps.android.compose.*
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.graphics.toArgb
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.util.MapTileIndex
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Polygon as OsmPolygon
+import org.osmdroid.views.overlay.Marker as OsmMarker
+import org.osmdroid.views.overlay.Polyline as OsmPolyline
+import com.beraucoal.kakao.utils.PolyUtil
 
 /**
  * Layar Pemetaan Mandiri Petani (Alur UX 3 - v2).
@@ -66,14 +74,17 @@ fun SelfMappingScreen(
 
     // Camera & GPS
     val defaultCenter = LatLng(2.15340, 117.48120) // Berau default coordinate
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultCenter, 16f)
+    var mapCenterTrigger by remember { mutableStateOf<Pair<GeoPoint, Double>?>(null) }
+    var currentCameraCenter by remember { mutableStateOf(GeoPoint(defaultCenter.latitude, defaultCenter.longitude)) }
+    
+    LaunchedEffect(Unit) {
+        mapCenterTrigger = Pair(GeoPoint(defaultCenter.latitude, defaultCenter.longitude), 16.0)
     }
 
     // Live area calculations & intersection checks
     LaunchedEffect(boundaryPoints.size) {
         if (boundaryPoints.size >= 3) {
-            val areaSqMeters = SphericalUtil.computeArea(boundaryPoints)
+            val areaSqMeters = PolyUtil.computeArea(boundaryPoints)
             calculatedHectares = (areaSqMeters / 10000.0 * 100.0).toInt() / 100.0
             isOverlapping = repository.checkOverlap(boundaryPoints)
         } else {
@@ -122,7 +133,7 @@ fun SelfMappingScreen(
                     isValid = namaKebun.isNotBlank()
                 )
                 3 -> LiveMapMappingContent(
-                    cameraPositionState = cameraPositionState,
+                    mapCenterTrigger = mapCenterTrigger, currentCameraCenter = currentCameraCenter,
                     points = boundaryPoints,
                     calculatedHectares = calculatedHectares,
                     intersectionError = intersectionErrorMsg,
@@ -321,7 +332,7 @@ private fun FormInfoStepContent(
 
 @Composable
 private fun LiveMapMappingContent(
-    cameraPositionState: CameraPositionState,
+    mapCenterTrigger: Pair<GeoPoint, Double>?, currentCameraCenter: GeoPoint,
     points: List<LatLng>,
     calculatedHectares: Double,
     intersectionError: String?,
@@ -331,52 +342,78 @@ private fun LiveMapMappingContent(
     onUndo: () -> Unit,
     onNext: () -> Unit
 ) {
-    var mapType by remember { mutableStateOf(MapType.HYBRID) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap(
+        AndroidView(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(mapType = mapType, isMyLocationEnabled = false),
-            uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false),
-            onMapClick = { latLng -> onAddPoint(latLng) }
-        ) {
-            // Gambar Polygon jika titik >= 3
-            if (points.size >= 3) {
-                Polygon(
-                    points = points,
-                    strokeColor = Color(0xFFFFEB3B),
-                    strokeWidth = 6f,
-                    fillColor = Color(0xFF2E7D32).copy(alpha = 0.35f)
-                )
-            } else if (points.size == 2) {
-                Polyline(
-                    points = points,
-                    color = Color(0xFFFFEB3B),
-                    width = 6f
-                )
-            }
-
-            // Render Marker Tiap Sudut (Draggable)
-            points.forEachIndexed { index, pt ->
-                val isFirst = (index == 0)
-                val markerState = remember(index) { MarkerState(position = pt) }
-                LaunchedEffect(pt) {
-                    if (markerState.position != pt) markerState.position = pt
+            factory = { ctx ->
+                MapView(ctx).apply {
+                    setMultiTouchControls(true)
+                    val tileSource = object : OnlineTileSourceBase(
+                        "EsriWorldImagery", 1, 19, 256, ".png",
+                        arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/")
+                    ) {
+                        override fun getTileURLString(pMapTileIndex: Long): String {
+                            return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" + MapTileIndex.getY(pMapTileIndex) + "/" + MapTileIndex.getX(pMapTileIndex)
+                        }
+                    }
+                    setTileSource(tileSource)
                 }
-                LaunchedEffect(markerState.position) {
-                    if (index < points.size && points[index] != markerState.position) {
-                        onPointDrag(index, markerState.position)
+            },
+            update = { mapView ->
+                mapCenterTrigger?.let { (center, zoom) ->
+                    mapView.controller.setZoom(zoom)
+                    mapView.controller.animateTo(center)
+                }
+                
+                val mReceive = object : org.osmdroid.views.overlay.Overlay() {
+                    override fun onSingleTapConfirmed(e: android.view.MotionEvent, mapView: MapView): Boolean {
+                        val proj = mapView.projection
+                        val loc = proj.fromPixels(e.x.toInt(), e.y.toInt())
+                        onAddPoint(LatLng(loc.latitude, loc.longitude))
+                        return true
                     }
                 }
-                Marker(
-                    state = markerState,
-                    title = if (isFirst) "Titik #1 (Awal - Draggable)" else "Titik #${index + 1} (Draggable)",
-                    snippet = "Tahan & geser (drag) untuk mengubah posisi tanpa berjalan",
-                    draggable = true
-                )
+                
+                mapView.overlays.clear()
+                mapView.overlays.add(mReceive)
+
+                if (points.size >= 3) {
+                    val p = OsmPolygon()
+                    p.points = points.map { GeoPoint(it.latitude, it.longitude) }
+                    p.fillPaint.color = Color(0xFF2E7D32).copy(alpha = 0.35f).toArgb()
+                    p.outlinePaint.color = Color(0xFFFFEB3B).toArgb()
+                    p.outlinePaint.strokeWidth = 6f
+                    mapView.overlays.add(p)
+                } else if (points.size == 2) {
+                    val p = org.osmdroid.views.overlay.Polyline()
+                    p.setPoints(points.map { GeoPoint(it.latitude, it.longitude) })
+                    p.outlinePaint.color = Color(0xFFFFEB3B).toArgb()
+                    p.outlinePaint.strokeWidth = 6f
+                    mapView.overlays.add(p)
+                }
+
+                points.forEachIndexed { index, pt ->
+                    val isFirst = (index == 0)
+                    val m = OsmMarker(mapView)
+                    m.position = GeoPoint(pt.latitude, pt.longitude)
+                    m.title = if (isFirst) "Titik #1 (Awal - Draggable)" else "Titik #${index + 1} (Draggable)"
+                    m.snippet = "Tahan & geser (drag) untuk mengubah posisi tanpa berjalan"
+                    m.isDraggable = true
+                    m.setOnMarkerDragListener(object : OsmMarker.OnMarkerDragListener {
+                        override fun onMarkerDrag(marker: OsmMarker?) {}
+                        override fun onMarkerDragEnd(marker: OsmMarker?) {
+                            marker?.let {
+                                onPointDrag(index, LatLng(it.position.latitude, it.position.longitude))
+                            }
+                        }
+                        override fun onMarkerDragStart(marker: OsmMarker?) {}
+                    })
+                    mapView.overlays.add(m)
+                }
+                mapView.invalidate()
             }
-        }
+        )
 
         // ── Top Bar Counter & Instruction ──
         Surface(
@@ -435,7 +472,7 @@ private fun LiveMapMappingContent(
                     Button(
                         onClick = {
                             // Tandai dari posisi tengah layar kamera
-                            onAddPoint(cameraPositionState.position.target)
+                            onAddPoint(LatLng(currentCameraCenter.latitude, currentCameraCenter.longitude))
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = KakaoColors.Primary),
                         modifier = Modifier.weight(1f).height(48.dp)
@@ -480,11 +517,8 @@ private fun ReviewPolygonContent(
     onConfirm: () -> Unit
 ) {
     val center = if (points.isNotEmpty()) {
-        LatLng(points.map { it.latitude }.average(), points.map { it.longitude }.average())
-    } else LatLng(2.1534, 117.4812)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(center, 16f)
-    }
+        GeoPoint(points.map { it.latitude }.average(), points.map { it.longitude }.average())
+    } else GeoPoint(2.1534, 117.4812)
 
     Column(modifier = Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.SpaceBetween) {
         Column {
@@ -493,21 +527,37 @@ private fun ReviewPolygonContent(
 
             Spacer(Modifier.height(16.dp))
             Box(modifier = Modifier.fillMaxWidth().height(220.dp).clip(RoundedCornerShape(16.dp))) {
-                GoogleMap(
+                AndroidView(
                     modifier = Modifier.fillMaxSize(),
-                    cameraPositionState = cameraPositionState,
-                    properties = MapProperties(mapType = MapType.HYBRID),
-                    uiSettings = MapUiSettings(zoomControlsEnabled = false, scrollGesturesEnabled = false)
-                ) {
-                    if (points.size >= 3) {
-                        Polygon(
-                            points = points,
-                            strokeColor = if (isOverlapping) Color.Red else Color(0xFFFFEB3B),
-                            strokeWidth = 6f,
-                            fillColor = if (isOverlapping) Color.Red.copy(alpha = 0.4f) else Color(0xFF2E7D32).copy(alpha = 0.4f)
-                        )
+                    factory = { ctx ->
+                        MapView(ctx).apply {
+                            setMultiTouchControls(false)
+                            val tileSource = object : OnlineTileSourceBase(
+                                "EsriWorldImagery", 1, 19, 256, ".png",
+                                arrayOf("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/")
+                            ) {
+                                override fun getTileURLString(pMapTileIndex: Long): String {
+                                    return baseUrl + MapTileIndex.getZoom(pMapTileIndex) + "/" + MapTileIndex.getY(pMapTileIndex) + "/" + MapTileIndex.getX(pMapTileIndex)
+                                }
+                            }
+                            setTileSource(tileSource)
+                            controller.setZoom(16.0)
+                            controller.setCenter(center)
+                        }
+                    },
+                    update = { mapView ->
+                        mapView.overlays.clear()
+                        if (points.size >= 3) {
+                            val p = OsmPolygon()
+                            p.points = points.map { GeoPoint(it.latitude, it.longitude) }
+                            p.fillPaint.color = (if (isOverlapping) Color.Red.copy(alpha = 0.4f) else Color(0xFF2E7D32).copy(alpha = 0.4f)).toArgb()
+                            p.outlinePaint.color = (if (isOverlapping) Color.Red else Color(0xFFFFEB3B)).toArgb()
+                            p.outlinePaint.strokeWidth = 6f
+                            mapView.overlays.add(p)
+                        }
+                        mapView.invalidate()
                     }
-                }
+                )
             }
 
             Spacer(Modifier.height(16.dp))
